@@ -13,7 +13,7 @@
 
 ## Технологический стек
 
-- `Angular 21` (standalone components)
+- `Angular 22` (standalone components)
 - `TypeScript` (`strict`)
 - `Taiga UI` для интерфейса
 - `@ngrx/signals` + Angular Signals для состояния

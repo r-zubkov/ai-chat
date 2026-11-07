@@ -1,13 +1,13 @@
 ﻿import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TuiAutoFocus } from '@taiga-ui/cdk';
-import { TuiButton, TuiDialogContext, TuiError, TuiTextfield } from '@taiga-ui/core';
+import { TuiButton, TuiDialogContext, TuiError, TuiInput } from '@taiga-ui/core';
 import { injectContext } from '@taiga-ui/polymorpheus';
 import { trimRequiredValidator } from '@shared/validators';
 
 @Component({
   selector: 'app-change-chat-name-modal',
-  imports: [ReactiveFormsModule, TuiAutoFocus, TuiButton, TuiError, TuiTextfield],
+  imports: [ReactiveFormsModule, TuiAutoFocus, TuiButton, TuiError, TuiInput],
   templateUrl: './change-chat-name-modal.component.html',
   styleUrl: './change-chat-name-modal.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,

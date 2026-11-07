@@ -39,7 +39,7 @@
             type="button"
             [class.dropdown-open]="isItemOptionsDropdownOpen(chat.id)"
             tuiActiveZone
-            tuiDropdownAlign="right"
+            tuiDropdownAlign="end"
             [tuiDropdownSided]="true"
             [tuiDropdown]="dropdownItemOptionsContent"
             [tuiDropdownManual]="isItemOptionsDropdownOpen(chat.id)"
@@ -52,14 +52,13 @@
 
             <ng-template #dropdownItemOptionsContent>
               <tui-data-list class="action-list--compact-spacing">
-                <button tuiOption new type="button" (click)="handleRenameChat(chat)">
+                <button tuiOption type="button" (click)="handleRenameChat(chat)">
                   <tui-icon icon="@tui.pencil" [style.font-size.rem]="1" />
                   <span>Переименовать</span>
                 </button>
                 <button
                   class="tui-text-danger"
                   tuiOption
-                  new
                   type="button"
                   (click)="handleDeleteChat(chat)"
                 >

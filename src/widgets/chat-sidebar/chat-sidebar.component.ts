@@ -1,12 +1,12 @@
 ﻿import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  TuiAlertService,
   TuiDataList,
   TuiDialogService,
   TuiDropdown,
   TuiIcon,
   TuiLoader,
+  TuiNotificationService,
   TuiScrollbar,
 } from '@taiga-ui/core';
 import { TUI_CONFIRM, TuiConfirmData } from '@taiga-ui/kit';
@@ -48,7 +48,7 @@ const TuiConfirmText: TuiConfirmData = {
 export class ChatSidebarComponent {
   private readonly openItems = new Set<string | number>();
 
-  private readonly alerts = inject(TuiAlertService);
+  private readonly notifications = inject(TuiNotificationService);
   private readonly dialogs = inject(TuiDialogService);
 
   readonly chatStore = inject(ChatStore);
@@ -67,14 +67,14 @@ export class ChatSidebarComponent {
 
     this.dialogs
       .open<string>(new PolymorpheusComponent(ChangeChatNameModalComponent), {
-        appearance: 'chatModal',
+        appearance: 'taiga chatModal',
         label: 'Переименовать чат',
         size: 'm',
         data: chat.title,
       })
       .subscribe((title: string) => {
         if (!title.trim()) {
-          this.alerts
+          this.notifications
             .open('Название не может быть короче 1 символа', { appearance: 'negative' })
             .pipe(take(1))
             .subscribe();

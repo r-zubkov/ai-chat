@@ -1,10 +1,10 @@
+import { provideTaiga } from '@taiga-ui/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { provideEventPlugins } from '@taiga-ui/event-plugins';
 import { provideHttpClient } from '@angular/common/http';
 
 bootstrapApplication(AppComponent, {
   ...appConfig,
-  providers: [...(appConfig.providers || []), provideHttpClient(), provideEventPlugins()],
+  providers: [...(appConfig.providers || []), provideHttpClient(), provideTaiga()],
 }).catch((err) => console.error(err));

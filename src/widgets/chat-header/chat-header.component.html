@@ -21,7 +21,7 @@
 
     <button
       tuiChevron
-      tuiDropdownAlign="right"
+      tuiDropdownAlign="end"
       tuiLink
       type="button"
       class="header__model-selection"
@@ -46,7 +46,7 @@
 <ng-template #dropdown>
   <tui-data-list>
     @for (model of selectModel.models; track model) {
-      <button tuiOption new type="button" (click)="onClick(model.id)">
+      <button tuiOption type="button" (click)="onClick(model.id)">
         {{ model.label }}
         @if (itemIsActive(model.id)) {
           <tui-icon icon="@tui.check" [style.font-size.rem]="1" />

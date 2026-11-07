@@ -1,12 +1,12 @@
 ﻿import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { isMobileDevice } from '@shared/helpers';
-import { TuiButton, TuiTextfield } from '@taiga-ui/core';
+import { TuiButton, TuiInput } from '@taiga-ui/core';
 import { TuiTextarea } from '@taiga-ui/kit';
 
 @Component({
   selector: 'app-chat-input',
-  imports: [ReactiveFormsModule, TuiTextarea, TuiTextfield, TuiButton],
+  imports: [ReactiveFormsModule, TuiTextarea, TuiInput, TuiButton],
   templateUrl: './chat-input.component.html',
   styleUrl: './chat-input.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
