@@ -17,7 +17,8 @@ import { RouterLink } from '@angular/router';
 import { take } from 'rxjs';
 import { Chat, ChatState, ChatStore } from '@entities/chat';
 import { ManageChatService, ChangeChatNameModalComponent } from '@features/manage-chat';
-import { ChatNavigationService } from '@shared/helpers';
+import { NavigateChatService } from '@features/navigate-chat';
+import { CHAT_ROUTES } from '@shared/routes';
 import { ModelLabelPipe } from '@shared/ui';
 
 const TuiConfirmText: TuiConfirmData = {
@@ -53,9 +54,10 @@ export class ChatSidebarComponent {
 
   readonly chatStore = inject(ChatStore);
   readonly manageChat = inject(ManageChatService);
-  private readonly chatNavigation = inject(ChatNavigationService);
+  private readonly navigateChat = inject(NavigateChatService);
 
   protected readonly ChatState = ChatState;
+  protected readonly chatRoutes = CHAT_ROUTES;
   protected readonly isLoadingMoreChats = signal(false);
 
   protected handleOpenItemOptionsDropdown(chatId: string): void {
@@ -93,7 +95,7 @@ export class ChatSidebarComponent {
       .subscribe((confirm) => {
         if (confirm) {
           void this.manageChat.deleteChat(chat.id).finally(() => {
-            void this.chatNavigation.navigateToNewChat();
+            void this.navigateChat.toNewChat();
           });
         }
       });
@@ -105,7 +107,7 @@ export class ChatSidebarComponent {
       .subscribe((confirm) => {
         if (confirm) {
           void this.manageChat.deleteAllChats().finally(() => {
-            void this.chatNavigation.navigateToNewChat();
+            void this.navigateChat.toNewChat();
           });
         }
       });

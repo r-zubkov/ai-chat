@@ -3,10 +3,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChatState, ChatStore } from '@entities/chat';
 import { MessageStore } from '@entities/message';
 import { SettingsStore } from '@entities/settings';
+import { NavigateChatService } from '@features/navigate-chat';
 import { SendMessageEventType, SendMessageService } from '@features/send-message';
-import { ChatNavigationService } from '@shared/helpers';
+import { ShellUiService } from '@shared/ui';
 import { ChatInputComponent } from '@widgets/chat-input';
-import { AppUiService } from '@app/app-ui.service';
 
 @Component({
   selector: 'app-new-chat-page',
@@ -23,14 +23,14 @@ export class NewChatPage implements OnInit {
   readonly settings = inject(SettingsStore);
 
   private readonly sendMessageService = inject(SendMessageService);
-  private readonly chatNavigation = inject(ChatNavigationService);
-  private readonly appUi = inject(AppUiService);
+  private readonly navigateChat = inject(NavigateChatService);
+  private readonly shellUi = inject(ShellUiService);
 
   ngOnInit(): void {
     this.chatStore.setActive(null);
     this.messageStore.clearState();
     this.settings.setCurrentModel(this.settings.globalCurrentModel());
-    this.appUi.closeSidebarOnMobile();
+    this.shellUi.closeSidebarOnMobile();
   }
 
   protected onSendMessage(text: string): void {
@@ -40,7 +40,7 @@ export class NewChatPage implements OnInit {
       .subscribe({
         next: (event) => {
           if (event.type === SendMessageEventType.SENT) {
-            void this.chatNavigation.navigateToChat(event.chatId);
+            void this.navigateChat.toChat(event.chatId);
           }
         },
         error: (err) => console.error('Error sending message:', err),

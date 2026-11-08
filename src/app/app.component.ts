@@ -13,9 +13,9 @@ import { TuiRoot } from '@taiga-ui/core';
 import { ChatStore } from '@entities/chat';
 import { SettingsStore } from '@entities/settings';
 import { SendMessageService } from '@features/send-message';
+import { ShellUiService } from '@shared/ui';
 import { ChatHeaderComponent, ChatSidebarComponent } from '@widgets';
 import { AppStateService } from './app-state.service';
-import { AppUiService } from './app-ui.service';
 
 const BASE_PAGE_TITLE = 'AI Chat';
 
@@ -30,7 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
   private lastObservedWidth?: number;
 
-  readonly appUi = inject(AppUiService);
+  readonly shellUi = inject(ShellUiService);
   private readonly appState = inject(AppStateService);
   private readonly chatStore = inject(ChatStore);
   private readonly settingsStore = inject(SettingsStore);
@@ -73,7 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (width === this.lastObservedWidth) return;
 
       this.lastObservedWidth = width;
-      this.appUi.updateMobileState(width);
+      this.shellUi.updateMobileState(width);
     });
 
     this.resizeObserver.observe(document.body);

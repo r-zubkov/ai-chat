@@ -1,10 +1,10 @@
-﻿import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { getCssValue } from '@shared/helpers';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AppUiService {
+export class ShellUiService {
   readonly sidebarOpen = signal<boolean>(true);
   readonly isMobile = signal<boolean>(false);
 

@@ -5,7 +5,6 @@ export { escapeHtml } from './escape-html';
 export { remToPx } from './rem-to-px';
 export { getCssValue } from './get-css-value';
 export { isMobileDevice } from './is-mobile-device';
-export { ChatNavigationService } from './chat-navigation.service';
 export {
   extractPlainTextFromHtml,
   copyPlainTextToClipboard,

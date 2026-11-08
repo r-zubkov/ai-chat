@@ -1,6 +1,6 @@
 ﻿<tui-root tuiTheme="dark">
-  <div class="app-root flex" [class.mobile]="appUi.isMobile()">
-    @if (appUi.sidebarOpen()) {
+  <div class="app-root flex" [class.mobile]="shellUi.isMobile()">
+    @if (shellUi.sidebarOpen()) {
       <aside class="sidebar">
         <app-chat-sidebar></app-chat-sidebar>
       </aside>

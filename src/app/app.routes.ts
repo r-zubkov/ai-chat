@@ -1,26 +1,27 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
+import { CHAT_ROUTES, CHAT_ROUTE_SEGMENTS } from '@shared/routes';
 import { initialDataGuard } from './guards/initial-data.guard';
 
 export const appRoutes: Routes = [
-  { path: '', redirectTo: '/chats', pathMatch: 'full' },
+  { path: '', redirectTo: CHAT_ROUTES.root, pathMatch: 'full' },
   {
-    path: 'chats',
+    path: CHAT_ROUTE_SEGMENTS.root,
     canMatch: [initialDataGuard],
     children: [
       {
         path: '',
-        redirectTo: 'new',
+        redirectTo: CHAT_ROUTE_SEGMENTS.new,
         pathMatch: 'full',
       },
       {
-        path: 'new',
+        path: CHAT_ROUTE_SEGMENTS.new,
         loadComponent: () => import('@pages/new-chat').then((m) => m.NewChatPage),
       },
       {
-        path: ':id',
+        path: CHAT_ROUTE_SEGMENTS.id,
         loadComponent: () => import('@pages/user-chat').then((m) => m.UserChatPage),
       },
     ],
   },
-  { path: '**', redirectTo: '/chats' },
+  { path: '**', redirectTo: CHAT_ROUTES.root },
 ];

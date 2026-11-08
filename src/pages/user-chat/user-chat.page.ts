@@ -12,18 +12,18 @@ import { TuiButton, TuiScrollbar } from '@taiga-ui/core';
 import { ChatState, ChatStore, toChatId } from '@entities/chat';
 import { ChatMessage, ChatMessageRole, MessageStore } from '@entities/message';
 import { ManageChatService } from '@features/manage-chat';
+import { NavigateChatService } from '@features/navigate-chat';
 import { SendMessageEvent, SendMessageEventType, SendMessageService } from '@features/send-message';
 import { SelectModelService } from '@features/select-model';
 import {
-  ChatNavigationService,
   getCssValue,
   handleCodeBlockCopyClick,
   handleCodeBlockCopyKeydown,
   remToPx,
 } from '@shared/helpers';
 import { CopyTextButtonComponent, MarkdownPipe, ModelLabelPipe } from '@shared';
+import { ShellUiService } from '@shared/ui';
 import { ChatInputComponent } from '@widgets/chat-input';
-import { AppUiService } from '@app/app-ui.service';
 
 @Component({
   selector: 'app-user-chat-page',
@@ -48,14 +48,14 @@ export class UserChatPage {
 
   private readonly sendMessageService = inject(SendMessageService);
   private readonly selectModel = inject(SelectModelService);
-  private readonly chatNavigation = inject(ChatNavigationService);
-  private readonly appUi = inject(AppUiService);
+  private readonly navigateChat = inject(NavigateChatService);
+  private readonly shellUi = inject(ShellUiService);
 
   @Input() set id(chatId: string) {
     const activeId = toChatId(chatId);
     this.chatStore.setActive(activeId);
     this.selectModel.syncCurrentModelForChat(activeId);
-    this.appUi.closeSidebarOnMobile();
+    this.shellUi.closeSidebarOnMobile();
     void this.loadMessages(activeId, 'instant');
   }
 
@@ -125,7 +125,7 @@ export class UserChatPage {
     }
 
     if (!hasChat) {
-      await this.chatNavigation.navigateToNewChat();
+      await this.navigateChat.toNewChat();
       return;
     }
 

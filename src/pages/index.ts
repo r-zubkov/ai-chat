@@ -1,2 +1,2 @@
-﻿export * from './new-chat/new-chat.page';
-export * from './user-chat/user-chat.page';
+export * from './new-chat';
+export * from './user-chat';

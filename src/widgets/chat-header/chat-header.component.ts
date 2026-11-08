@@ -5,7 +5,8 @@ import { TuiChevron } from '@taiga-ui/kit';
 import { ChatStore } from '@entities/chat';
 import { ModelType, SettingsStore } from '@entities/settings';
 import { SelectModelService } from '@features/select-model';
-import { AppUiService } from '@app/app-ui.service';
+import { CHAT_ROUTES } from '@shared/routes';
+import { ShellUiService } from '@shared/ui';
 
 @Component({
   selector: 'app-chat-header',
@@ -18,7 +19,7 @@ export class ChatHeaderComponent {
   protected modelSelectionOpen: boolean = false;
 
   readonly settingsStore = inject(SettingsStore);
-  readonly appUi = inject(AppUiService);
+  readonly shellUi = inject(ShellUiService);
   readonly selectModel = inject(SelectModelService);
   readonly chatStore = inject(ChatStore);
 
@@ -26,6 +27,7 @@ export class ChatHeaderComponent {
     const currentModel = this.settingsStore.currentModel();
     return this.selectModel.models.find((model) => model.id === currentModel)?.label ?? null;
   });
+  protected readonly chatRoutes = CHAT_ROUTES;
 
   protected onClick(model: ModelType): void {
     void this.selectModel.selectModel(model);
@@ -37,6 +39,6 @@ export class ChatHeaderComponent {
   }
 
   protected toggleMenu(): void {
-    this.appUi.toggleSidebar();
+    this.shellUi.toggleSidebar();
   }
 }

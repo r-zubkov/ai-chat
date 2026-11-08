@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { toChatId } from '@entities/chat';
+import type { ChatId } from '@entities/chat';
 import { ModelType } from '@shared/config';
 import {
   ChatMessage,
@@ -76,7 +76,7 @@ function createMessage(params: {
 }): ChatMessage {
   return {
     id: toMessageId(params.id),
-    chatId: toChatId(params.chatId ?? 'chat-1'),
+    chatId: (params.chatId ?? 'chat-1') as ChatId,
     sequelId: toSequelId(params.sequelId ?? 1),
     role: params.role,
     model: params.model ?? ModelType.GPT_51,

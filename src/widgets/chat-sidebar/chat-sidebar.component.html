@@ -1,9 +1,6 @@
 ﻿<div class="sidebar-root flex flex-col h-full">
   <div class="sidebar-list sidebar-header">
-    <a
-      class="sidebar-list__btn sidebar-action-btn sidebar-new-btn"
-      [routerLink]="['/chats', 'new']"
-    >
+    <a class="sidebar-list__btn sidebar-action-btn sidebar-new-btn" [routerLink]="chatRoutes.new">
       <tui-icon icon="@tui.message-circle-plus" [style.font-size.rem]="1" />
       <span>Новый чат</span>
     </a>
@@ -18,7 +15,7 @@
         >
           <a
             class="sidebar-chat__link flex items-center gap-3 min-width-0 flex-auto"
-            [routerLink]="['/chats', chat.id]"
+            [routerLink]="chatRoutes.byId(chat.id)"
           >
             @if (chat.state === ChatState.THINKING) {
               <tui-loader [inheritColor]="true" />
