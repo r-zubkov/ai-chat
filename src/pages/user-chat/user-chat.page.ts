@@ -146,7 +146,7 @@ export class UserChatPage {
     const container = this.scrollBar?.nativeElement;
     if (!container) return;
 
-    const target = container.querySelector(`[data-id="${messageId}"]`) as HTMLElement | null;
+    const target = container.querySelector<HTMLElement>(`[data-id="${messageId}"]`);
     if (!target) return;
 
     const messageTopOffset = target.offsetTop;

@@ -28,7 +28,7 @@ export class MessageRepository {
   }
 
   async updateMessage(id: MessageId, data: Partial<ChatMessage>): Promise<void> {
-    await chatDB.messages.update(id, data as Partial<MessageRecord>);
+    await chatDB.messages.update(id, data);
   }
 
   async deleteByChatId(chatId: ChatId): Promise<void> {

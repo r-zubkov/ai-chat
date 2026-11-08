@@ -29,7 +29,7 @@ export function buildApiMessages(
     .slice(-HISTORY_LIMIT)
     .filter((message) => message.state !== ChatMessageState.ERROR)
     .map<ChatRequestMessage>((message) => ({
-      role: message.role as ChatRequestMessage['role'],
+      role: message.role,
       content: message.content,
     }));
 

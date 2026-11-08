@@ -25,19 +25,19 @@ describe('code-block-copy helpers', () => {
 
     let resetState: (() => void) | undefined;
     spyOn(globalThis, 'setTimeout').and.callFake((handler: TimerHandler) => {
-      if (typeof handler === 'function') {
-        resetState = () => handler();
+      if (isTimerCallback(handler)) {
+        resetState = handler;
       }
 
-      return 101 as unknown as ReturnType<typeof setTimeout>;
+      return 101;
     });
 
-    const event = createMouseEventMock(fixture.copyButton);
+    const { event, preventDefaultSpy } = createMouseEventMock(fixture.copyButton);
 
     handleCodeBlockCopyClick(event);
     await flushPromises();
 
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(preventDefaultSpy).toHaveBeenCalled();
     expect(clipboard.writeText).toHaveBeenCalledWith('const a = 1;');
     expect(fixture.copyButton.getAttribute('aria-label')).toBe('Скопировано');
     expect(fixture.copyButton.getAttribute('title')).toBe('Скопировано');
@@ -57,13 +57,13 @@ describe('code-block-copy helpers', () => {
     const fixture = createCodeBlockFixture('console.log(1)');
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
-    spyOn(globalThis, 'setTimeout').and.returnValue(1 as unknown as ReturnType<typeof setTimeout>);
-    const event = createKeyboardEventMock(fixture.copyButton, 'Enter');
+    spyOn(globalThis, 'setTimeout').and.returnValue(1);
+    const { event, preventDefaultSpy } = createKeyboardEventMock(fixture.copyButton, 'Enter');
 
     handleCodeBlockCopyKeydown(event);
     await flushPromises();
 
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(preventDefaultSpy).toHaveBeenCalled();
     expect(clipboard.writeText).toHaveBeenCalledWith('console.log(1)');
   });
 
@@ -71,12 +71,12 @@ describe('code-block-copy helpers', () => {
     const fixture = createCodeBlockFixture('console.log(1)');
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
-    const event = createKeyboardEventMock(fixture.copyButton, 'Escape');
+    const { event, preventDefaultSpy } = createKeyboardEventMock(fixture.copyButton, 'Escape');
 
     handleCodeBlockCopyKeydown(event);
     await flushPromises();
 
-    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
     expect(clipboard.writeText).not.toHaveBeenCalled();
   });
 
@@ -84,12 +84,12 @@ describe('code-block-copy helpers', () => {
     const fixture = createCodeBlockFixture('const a = 1;');
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
-    const event = createMouseEventMock(fixture.container);
+    const { event, preventDefaultSpy } = createMouseEventMock(fixture.container);
 
     handleCodeBlockCopyClick(event);
     await flushPromises();
 
-    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
     expect(clipboard.writeText).not.toHaveBeenCalled();
   });
 
@@ -97,12 +97,12 @@ describe('code-block-copy helpers', () => {
     const fixture = createCodeBlockFixture('   ');
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
-    const event = createMouseEventMock(fixture.copyButton);
+    const { event, preventDefaultSpy } = createMouseEventMock(fixture.copyButton);
 
     handleCodeBlockCopyClick(event);
     await flushPromises();
 
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(preventDefaultSpy).toHaveBeenCalled();
     expect(clipboard.writeText).not.toHaveBeenCalled();
     expect(fixture.copyButton.getAttribute('data-copied')).toBeNull();
   });
@@ -116,21 +116,30 @@ describe('code-block-copy helpers', () => {
     let timerId = 0;
     spyOn(globalThis, 'setTimeout').and.callFake(() => {
       timerId += 1;
-      return timerId as unknown as ReturnType<typeof setTimeout>;
+      return timerId;
     });
 
-    const firstEvent = createMouseEventMock(fixture.copyButton);
-    const secondEvent = createMouseEventMock(fixture.copyButton);
+    const { event: firstEvent } = createMouseEventMock(fixture.copyButton);
+    const { event: secondEvent } = createMouseEventMock(fixture.copyButton);
 
     handleCodeBlockCopyClick(firstEvent);
     await flushPromises();
     handleCodeBlockCopyClick(secondEvent);
     await flushPromises();
 
-    expect(clearTimeoutSpy).toHaveBeenCalledWith(1 as unknown as ReturnType<typeof setTimeout>);
+    expect(clearTimeoutSpy).toHaveBeenCalledWith(1);
     expect(clipboard.writeText).toHaveBeenCalledTimes(2);
   });
 });
+
+function isTimerCallback(handler: TimerHandler): handler is () => void {
+  return typeof handler === 'function';
+}
+
+interface EventMock<T extends Event> {
+  event: T;
+  preventDefaultSpy: jasmine.Spy<() => void>;
+}
 
 function createCodeBlockFixture(codeText: string): {
   container: HTMLElement;
@@ -154,26 +163,36 @@ function createCodeBlockFixture(codeText: string): {
   return { container, copyButton };
 }
 
-function createMouseEventMock(target: EventTarget): MouseEvent {
+function createMouseEventMock(target: EventTarget): EventMock<MouseEvent> {
+  const preventDefaultSpy = jasmine.createSpy<() => void>('preventDefault');
+
   return {
-    target,
-    preventDefault: jasmine.createSpy('preventDefault'),
-  } as unknown as MouseEvent;
+    event: {
+      target,
+      preventDefault: preventDefaultSpy,
+    } as unknown as MouseEvent,
+    preventDefaultSpy,
+  };
 }
 
-function createKeyboardEventMock(target: EventTarget, key: string): KeyboardEvent {
+function createKeyboardEventMock(target: EventTarget, key: string): EventMock<KeyboardEvent> {
+  const preventDefaultSpy = jasmine.createSpy<() => void>('preventDefault');
+
   return {
-    target,
-    key,
-    preventDefault: jasmine.createSpy('preventDefault'),
-  } as unknown as KeyboardEvent;
+    event: {
+      target,
+      key,
+      preventDefault: preventDefaultSpy,
+    } as unknown as KeyboardEvent,
+    preventDefaultSpy,
+  };
 }
 
 function createClipboardMock(): Pick<Clipboard, 'writeText'> & {
   writeText: jasmine.Spy<(text: string) => Promise<void>>;
 } {
   return {
-    writeText: jasmine.createSpy('writeText').and.callFake(async () => undefined),
+    writeText: jasmine.createSpy('writeText').and.callFake(() => Promise.resolve()),
   };
 }
 

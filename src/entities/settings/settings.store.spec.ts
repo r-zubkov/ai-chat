@@ -4,9 +4,14 @@ import { SettingKey } from './settings.model';
 import { SettingsRepository } from './settings.repository';
 import { SettingsStore } from './settings.store';
 
+type SettingsRepositoryMock = {
+  getSetting: jasmine.Spy<SettingsRepository['getSetting']>;
+  setSetting: jasmine.Spy<SettingsRepository['setSetting']>;
+};
+
 describe('SettingsStore', () => {
   let store: InstanceType<typeof SettingsStore>;
-  let settingsRepository: jasmine.SpyObj<SettingsRepository>;
+  let settingsRepository: SettingsRepositoryMock;
 
   beforeEach(() => {
     settingsRepository = jasmine.createSpyObj<SettingsRepository>('SettingsRepository', [

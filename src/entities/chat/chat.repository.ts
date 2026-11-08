@@ -24,7 +24,7 @@ export class ChatRepository {
   }
 
   async update(id: ChatId, data: Partial<Omit<Chat, 'id'>>): Promise<void> {
-    await chatDB.chats.update(id, data as Partial<ChatRecord>);
+    await chatDB.chats.update(id, data);
   }
 
   async delete(id: ChatId): Promise<void> {

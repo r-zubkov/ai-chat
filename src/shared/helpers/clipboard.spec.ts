@@ -24,7 +24,7 @@ describe('clipboard helpers', () => {
 
   it('копирует plain text в буфер обмена', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(async () => undefined);
+    clipboard.writeText.and.callFake(() => Promise.resolve());
     setNavigatorClipboard(clipboard);
 
     const copied = await copyPlainTextToClipboard('Текст');
@@ -43,9 +43,7 @@ describe('clipboard helpers', () => {
 
   it('возвращает false для plain text при ошибке записи', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(async () => {
-      throw new Error('Ошибка записи');
-    });
+    clipboard.writeText.and.callFake(() => Promise.reject(new Error('Ошибка записи')));
     setNavigatorClipboard(clipboard);
     spyOn(console, 'error');
 
@@ -57,7 +55,7 @@ describe('clipboard helpers', () => {
 
   it('копирует html через ClipboardItem, если доступна rich-copy запись', async () => {
     const clipboard = createClipboardMock();
-    clipboard.write.and.callFake(async () => undefined);
+    clipboard.write.and.callFake(() => Promise.resolve());
     setNavigatorClipboard(clipboard);
     setClipboardItemMock();
 
@@ -70,7 +68,7 @@ describe('clipboard helpers', () => {
 
   it('делает fallback на plain text, если ClipboardItem недоступен', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(async () => undefined);
+    clipboard.writeText.and.callFake(() => Promise.resolve());
     setNavigatorClipboard(clipboard);
     Object.defineProperty(globalThis, 'ClipboardItem', {
       value: undefined,
@@ -87,10 +85,8 @@ describe('clipboard helpers', () => {
 
   it('делает fallback на plain text при ошибке rich-copy записи', async () => {
     const clipboard = createClipboardMock();
-    clipboard.write.and.callFake(async () => {
-      throw new Error('Ошибка rich-copy');
-    });
-    clipboard.writeText.and.callFake(async () => undefined);
+    clipboard.write.and.callFake(() => Promise.reject(new Error('Ошибка rich-copy')));
+    clipboard.writeText.and.callFake(() => Promise.resolve());
     setNavigatorClipboard(clipboard);
     setClipboardItemMock();
     spyOn(console, 'error');
@@ -135,7 +131,7 @@ function setClipboardItemMock(): void {
   }
 
   Object.defineProperty(globalThis, 'ClipboardItem', {
-    value: MockClipboardItem as unknown as typeof ClipboardItem,
+    value: MockClipboardItem,
     configurable: true,
     writable: true,
   });

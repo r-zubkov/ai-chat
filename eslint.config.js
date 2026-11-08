@@ -63,6 +63,12 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: __dirname,
+      },
+    },
     plugins: {
       boundaries,
       import: importPlugin,
@@ -111,7 +117,7 @@ module.exports = tseslint.config(
     },
     extends: [
       js.configs.recommended,
-      ...tseslint.configs.recommended,
+      ...tseslint.configs.recommendedTypeChecked,
       ...angular.configs.tsRecommended,
       eslintConfigPrettier,
     ],
