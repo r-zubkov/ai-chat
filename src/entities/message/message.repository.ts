@@ -1,8 +1,16 @@
 ﻿import { Injectable } from '@angular/core';
 import Dexie from 'dexie';
 import { chatDB, MessageRecord } from '@shared/db';
+import { isModelType } from '@shared/config';
 import type { ChatId } from '@entities/chat';
-import { ChatMessage, MessageId, toMessageId, toSequelId } from './message.model';
+import {
+  ChatMessage,
+  MessageId,
+  isChatMessageRole,
+  isChatMessageState,
+  toMessageId,
+  toSequelId,
+} from './message.model';
 
 @Injectable({ providedIn: 'root' })
 export class MessageRepository {
@@ -36,12 +44,20 @@ export class MessageRepository {
   }
 
   private toDomain(row: MessageRecord): ChatMessage {
+    if (!isChatMessageRole(row.role) || !isChatMessageState(row.state) || !isModelType(row.model)) {
+      throw new Error(`Invalid message record: ${row.id}`);
+    }
+
     return {
-      ...row,
       id: toMessageId(row.id),
       chatId: row.chatId as ChatId,
       sequelId: toSequelId(row.sequelId),
-    } as ChatMessage;
+      role: row.role,
+      model: row.model,
+      state: row.state,
+      content: row.content,
+      timestamp: row.timestamp,
+    };
   }
 
   private toRecord(message: ChatMessage): MessageRecord {

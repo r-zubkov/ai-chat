@@ -28,7 +28,11 @@
   },
   "private": true,
   "lint-staged": {
-    "*.{ts,html,js,json,css,scss,less,md,yml,yaml}": "prettier --write"
+    "*.{ts,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,json,css,scss,less,md,yml,yaml}": "prettier --write"
   },
   "dependencies": {
     "@angular/common": "^22.2.5",

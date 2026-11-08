@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { chatDB, ChatRecord } from '@shared/db';
-import { DEFAULT_CHAT_LIST_LIMIT } from '@shared/config';
-import { Chat, ChatId, toChatId } from './chat.model';
+import { DEFAULT_CHAT_LIST_LIMIT, isModelType } from '@shared/config';
+import { Chat, ChatId, isChatState, toChatId } from './chat.model';
 
 @Injectable({ providedIn: 'root' })
 export class ChatRepository {
@@ -42,10 +42,19 @@ export class ChatRepository {
   }
 
   private toDomain(row: ChatRecord): Chat {
+    if (!isChatState(row.state) || !isModelType(row.model)) {
+      throw new Error(`Invalid chat record: ${row.id}`);
+    }
+
     return {
-      ...row,
       id: toChatId(row.id),
-    } as Chat;
+      title: row.title,
+      state: row.state,
+      model: row.model,
+      projectId: row.projectId,
+      currentRequestId: row.currentRequestId,
+      lastUpdate: row.lastUpdate,
+    };
   }
 
   private toRecord(chat: Chat): ChatRecord {

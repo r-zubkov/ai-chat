@@ -6,8 +6,8 @@ type MockEnvConfig = {
   userAgent: string;
 };
 
-const createMediaQueryList = (matches: boolean): MediaQueryList =>
-  ({
+const createMediaQueryList = (matches: boolean): MediaQueryList => {
+  const mediaQueryList: MediaQueryList = {
     matches,
     media: '(max-width: 1024px)',
     onchange: null,
@@ -16,7 +16,10 @@ const createMediaQueryList = (matches: boolean): MediaQueryList =>
     addEventListener: () => undefined,
     removeEventListener: () => undefined,
     dispatchEvent: () => false,
-  }) as MediaQueryList;
+  };
+
+  return mediaQueryList;
+};
 
 describe('isMobileDevice', () => {
   const mockEnvironment = ({ isSmallViewport, maxTouchPoints, userAgent }: MockEnvConfig): void => {

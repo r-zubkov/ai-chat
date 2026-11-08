@@ -4,6 +4,7 @@
   SYSTEM_PROMPT,
   STREAM_PERSIST_INTERVAL,
   ModelType,
+  isModelType,
 } from './models.config';
 export type { ModelOption } from './models.config';
 export { DEFAULT_CHAT_LIST_LIMIT } from './app.constants';

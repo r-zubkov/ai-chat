@@ -14,6 +14,10 @@
   DEEPSEEK_32 = 'deepseek-32',
 }
 
+export function isModelType(value: string): value is ModelType {
+  return Object.values<string>(ModelType).includes(value);
+}
+
 export type ModelOption = { id: ModelType; label: string };
 
 export const AVAILABLE_MODELS: ModelOption[] = [

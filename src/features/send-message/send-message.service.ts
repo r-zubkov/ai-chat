@@ -123,7 +123,7 @@ export class SendMessageService {
 
         const { requestId, stream$ } = this.socket.sendChatCompletion(model, apiMessages);
 
-        chat = await this.updateChat(chat, {
+        const activeChat = await this.updateChat(chat, {
           model,
           state: ChatState.THINKING,
           currentRequestId: requestId,
@@ -217,7 +217,7 @@ export class SendMessageService {
           .subscribe({
             error: (err: unknown) => {
               flushFinalPersist(ChatMessageState.ERROR, () => {
-                void this.updateChat(chat as Chat, {
+                void this.updateChat(activeChat, {
                   model,
                   state: ChatState.ERROR,
                   currentRequestId: null,
@@ -227,7 +227,7 @@ export class SendMessageService {
             },
             complete: () => {
               flushFinalPersist(ChatMessageState.COMPLETED, () => {
-                void this.updateChat(chat as Chat, {
+                void this.updateChat(activeChat, {
                   model,
                   state: ChatState.IDLE,
                   currentRequestId: null,

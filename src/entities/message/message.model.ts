@@ -18,10 +18,18 @@ export enum ChatMessageRole {
   SYSTEM = 'system',
 }
 
+export function isChatMessageRole(value: string): value is ChatMessageRole {
+  return Object.values<string>(ChatMessageRole).includes(value);
+}
+
 export enum ChatMessageState {
   STREAMING = 'streaming',
   COMPLETED = 'completed',
   ERROR = 'error',
+}
+
+export function isChatMessageState(value: string): value is ChatMessageState {
+  return Object.values<string>(ChatMessageState).includes(value);
 }
 
 export interface ChatMessage {

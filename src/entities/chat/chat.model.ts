@@ -12,6 +12,10 @@ export enum ChatState {
   ERROR = 'error',
 }
 
+export function isChatState(value: string): value is ChatState {
+  return Object.values<string>(ChatState).includes(value);
+}
+
 export interface Chat {
   readonly id: ChatId;
   title: string;

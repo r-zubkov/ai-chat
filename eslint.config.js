@@ -99,6 +99,13 @@ module.exports = tseslint.config(
       ],
     },
     rules: {
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        {
+          assertionStyle: 'as',
+          objectLiteralTypeAssertions: 'never',
+        },
+      ],
       'import/no-unresolved': ['error', { commonjs: true, caseSensitive: true }],
       'boundaries/element-types': ['error', elementTypeOptions],
       'boundaries/entry-point': [
@@ -125,6 +132,10 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.html'],
-    extends: [...angular.configs.templateRecommended, eslintConfigPrettier],
+    extends: [
+      ...angular.configs.templateRecommended,
+      ...angular.configs.templateAccessibility,
+      eslintConfigPrettier,
+    ],
   },
 );

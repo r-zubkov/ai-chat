@@ -33,13 +33,12 @@ export function buildApiMessages(
       content: message.content,
     }));
 
-  const historyWithLastUserMsg = [
-    ...historyTail,
-    {
-      role: userMessage.role as ChatRequestMessage['role'],
-      content: userMessage.content,
-    },
-  ];
+  const lastUserMessage: ChatRequestMessage = {
+    role: userMessage.role,
+    content: userMessage.content,
+  };
+
+  const historyWithLastUserMsg: ChatRequestMessage[] = [...historyTail, lastUserMessage];
 
   return applySystemPrompt(model, historyWithLastUserMsg, modelSystemPrompts);
 }
