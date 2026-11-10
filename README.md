@@ -31,7 +31,6 @@ Full-stack приложение для чата с AI: создание диал
 - `Node.js` + `TypeScript` (`strict`)
 - `Express` для HTTP API и статических файлов
 - `Socket.IO` для потокового ответа
-- `Timeweb Cloud AI` для доступа к AI-моделям
 - `esbuild` для сборки backend
 
 ### Инструменты разработки
