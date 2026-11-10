@@ -6,8 +6,4 @@ export const GROK_MODELS = defineFamilyModels(MODEL_FAMILY.GROK, {
     id: 'grok-4-fast',
     label: 'Grok 4 Fast',
   },
-  GROK_CODE_FAST_LEGACY: {
-    id: 'grok-code-fast',
-    label: 'Grok Code Fast',
-  },
 });

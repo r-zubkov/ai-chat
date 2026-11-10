@@ -6,8 +6,4 @@ export const DEEPSEEK_MODELS = defineFamilyModels(MODEL_FAMILY.DEEPSEEK, {
     id: 'deepseek-v3.2',
     label: 'DeepSeek V3.2',
   },
-  DEEPSEEK_V3_2_LEGACY: {
-    id: 'deepseek-32',
-    label: 'DeepSeek V3.2',
-  },
 });
