@@ -1,4 +1,4 @@
-import type { Adapter, ModelFamily } from './model.constants.js';
+import type { ModelFamily } from './model.constants.js';
 
 export interface ModelConfigInput {
   readonly id: string;
@@ -7,13 +7,4 @@ export interface ModelConfigInput {
 
 export interface FamilyModelConfig extends ModelConfigInput {
   readonly family: ModelFamily;
-}
-
-export interface AvailableModelConfig extends FamilyModelConfig {
-  readonly adapter: Adapter;
-}
-
-export interface AvailableModelGroup {
-  readonly adapter: Adapter;
-  readonly models: readonly FamilyModelConfig[];
 }

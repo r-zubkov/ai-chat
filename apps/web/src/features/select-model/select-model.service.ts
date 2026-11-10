@@ -1,15 +1,16 @@
 ﻿import { inject, Injectable } from '@angular/core';
 import { ChatId, ChatStore } from '@entities/chat';
+import { ModelStore } from '@entities/model';
 import { SettingsStore } from '@entities/settings';
 import type { ModelType } from '@entities/settings';
-import { AVAILABLE_MODELS, isModelType } from '@shared/config';
 
 @Injectable({ providedIn: 'root' })
 export class SelectModelService {
   private readonly chatStore = inject(ChatStore);
+  private readonly modelStore = inject(ModelStore);
   private readonly settingsStore = inject(SettingsStore);
 
-  readonly models = AVAILABLE_MODELS;
+  readonly models = this.modelStore.models;
 
   async selectModel(model: ModelType): Promise<void> {
     const modelToSet = this.normalizeModel(model);
@@ -24,17 +25,19 @@ export class SelectModelService {
   syncCurrentModelForChat(chatId: ChatId | null): void {
     if (chatId) {
       const activeChat = this.chatStore.activeChat();
-      const model = isModelType(activeChat?.model)
-        ? activeChat.model
-        : this.settingsStore.globalCurrentModel();
-      this.settingsStore.setCurrentModel(model);
+      const model =
+        activeChat && this.modelStore.isAvailable(activeChat.model)
+          ? activeChat.model
+          : this.settingsStore.globalCurrentModel();
+      if (model) this.settingsStore.setCurrentModel(model);
       return;
     }
 
-    this.settingsStore.setCurrentModel(this.settingsStore.globalCurrentModel());
+    const globalModel = this.settingsStore.globalCurrentModel();
+    if (globalModel) this.settingsStore.setCurrentModel(globalModel);
   }
 
   private normalizeModel(model: string): ModelType {
-    return isModelType(model) ? model : this.models[0].id;
+    return this.modelStore.isAvailable(model) ? model : this.modelStore.getDefaultModel();
   }
 }

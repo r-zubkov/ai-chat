@@ -9,8 +9,9 @@
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { TuiRoot } from '@taiga-ui/core';
+import { TuiButton, TuiLoader, TuiRoot } from '@taiga-ui/core';
 import { ChatStore } from '@entities/chat';
+import { ModelStore } from '@entities/model';
 import { SettingsStore } from '@entities/settings';
 import { SendMessageService } from '@features/send-message';
 import { ShellUiService } from '@shared/ui';
@@ -18,10 +19,11 @@ import { ChatHeaderComponent, ChatSidebarComponent } from '@widgets';
 import { AppStateService } from './app-state.service';
 
 const BASE_PAGE_TITLE = 'AI Chat';
+const INITIALIZATION_MIN_DURATION = 700;
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TuiRoot, ChatSidebarComponent, ChatHeaderComponent],
+  imports: [RouterOutlet, TuiButton, TuiLoader, TuiRoot, ChatSidebarComponent, ChatHeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,8 +33,9 @@ export class AppComponent implements OnInit, OnDestroy {
   private lastObservedWidth?: number;
 
   readonly shellUi = inject(ShellUiService);
-  private readonly appState = inject(AppStateService);
+  readonly appState = inject(AppStateService);
   private readonly chatStore = inject(ChatStore);
+  private readonly modelStore = inject(ModelStore);
   private readonly settingsStore = inject(SettingsStore);
   private readonly sendMessage = inject(SendMessageService);
   private readonly title = inject(Title);
@@ -43,10 +46,22 @@ export class AppComponent implements OnInit, OnDestroy {
       this.title.setTitle(chatTitle ? `${BASE_PAGE_TITLE} - ${chatTitle}` : BASE_PAGE_TITLE);
     });
 
+    const cachedModels = this.modelStore.restoreCachedModels();
+
     this.appState.registerInitialDataLoad(
-      Promise.all([this.settingsStore.loadSettings(), this.chatStore.loadAll()]).then(
-        () => undefined,
-      ),
+      async () => {
+        const models =
+          cachedModels ??
+          (await withMinimumDuration(
+            this.modelStore.refreshAvailableModels(),
+            INITIALIZATION_MIN_DURATION,
+          ));
+
+        await Promise.all([this.settingsStore.loadSettings(models), this.chatStore.loadAll()]);
+
+        if (cachedModels) void this.refreshAvailableModelsInBackground();
+      },
+      { showLoader: cachedModels === null },
     );
   }
 
@@ -62,6 +77,19 @@ export class AppComponent implements OnInit, OnDestroy {
   @HostListener('window:beforeunload')
   onBeforeUnload(): void {
     this.sendMessage.destroy();
+  }
+
+  protected retryInitialDataLoad(): void {
+    this.appState.retryInitialDataLoad();
+  }
+
+  private async refreshAvailableModelsInBackground(): Promise<void> {
+    try {
+      const models = await this.modelStore.refreshAvailableModels();
+      await this.settingsStore.reconcileAvailableModels(models);
+    } catch (error: unknown) {
+      console.warn('Failed to refresh available models', error);
+    }
   }
 
   private observeWidthChange(): void {
@@ -84,4 +112,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.resizeObserver = undefined;
     this.lastObservedWidth = undefined;
   }
+}
+
+async function withMinimumDuration<T>(operation: Promise<T>, duration: number): Promise<T> {
+  const startedAt = Date.now();
+  let result: T;
+
+  try {
+    result = await operation;
+  } finally {
+    const remainingDuration = duration - (Date.now() - startedAt);
+    if (remainingDuration > 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, remainingDuration));
+    }
+  }
+
+  return result;
 }

@@ -26,7 +26,7 @@ export class ChatHeaderComponent {
 
   protected readonly selectedModel = computed(() => {
     const currentModel = this.settingsStore.currentModel();
-    return this.selectModel.models.find((model) => model.id === currentModel)?.label ?? null;
+    return this.selectModel.models().find((model) => model.id === currentModel)?.label ?? null;
   });
   protected readonly chatRoutes = CHAT_ROUTES;
 

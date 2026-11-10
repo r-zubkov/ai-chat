@@ -9,7 +9,9 @@ import { InferenceAdapterRegistry } from './adapters/inference-adapter-registry.
 import { ChatService } from './chat/chat.service.js';
 import type { InferenceAdapter } from './chat/inference-adapter.js';
 import type { ApiEnvironment } from './config/environment.js';
+import type { AvailableModels } from './models/available-models.js';
 import { registerChatRoute } from './transports/http/chat.route.js';
+import { registerModelsRoute } from './transports/http/models.route.js';
 import { registerChatSocket } from './transports/socket/chat.socket.js';
 import type { ClientToServerEvents, ServerToClientEvents } from '@ai-chat/contracts';
 
@@ -22,6 +24,7 @@ export interface ApiApplication {
 export function createApplication(
   environment: ApiEnvironment,
   inferenceAdapters: readonly InferenceAdapter[],
+  availableModels: AvailableModels,
 ): ApiApplication {
   const app = express();
   const httpServer = createServer(app);
@@ -32,7 +35,10 @@ export function createApplication(
       methods: ['GET', 'POST'],
     },
   });
-  const chatService = new ChatService(new InferenceAdapterRegistry(inferenceAdapters));
+  const chatService = new ChatService(
+    new InferenceAdapterRegistry(inferenceAdapters),
+    availableModels,
+  );
 
   app.use(express.json({ limit: '5mb' }));
   if (environment.mode === 'dev') {
@@ -47,6 +53,7 @@ export function createApplication(
   }
 
   registerChatRoute(app, chatService);
+  registerModelsRoute(app, availableModels);
   registerChatSocket(io, chatService);
 
   app.use('/api', (_request, response) => {

@@ -1,5 +1,4 @@
 import {
-  AVAILABLE_MODELS as AVAILABLE_MODEL_MAP,
   DEEPSEEK_MODELS,
   GEMINI_MODELS,
   GPT_MODELS,
@@ -11,7 +10,6 @@ import {
 
 export type ModelType = ModelId;
 
-export const AVAILABLE_MODELS = Object.values(AVAILABLE_MODEL_MAP);
 export type ModelOption = ModelDefinition;
 
 export { DEEPSEEK_MODELS, GEMINI_MODELS, GPT_MODELS, GROK_MODELS };

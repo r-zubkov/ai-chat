@@ -1,4 +1,5 @@
-import { ADAPTER, CHAT_ERROR_CODE } from '@ai-chat/contracts';
+import { CHAT_ERROR_CODE } from '@ai-chat/contracts';
+import { ADAPTER } from '../adapter.constants.js';
 import { ChatServiceError } from '../../chat/chat.error.js';
 import type {
   ChatStreamEvent,
@@ -6,7 +7,7 @@ import type {
   InferenceRequest,
 } from '../../chat/inference-adapter.js';
 import { parseTimewebStream } from './timeweb-stream.parser.js';
-import { loadTimewebConfig, type TimewebConfig } from './timeweb.config.js';
+import type { TimewebConfig } from './timeweb.config.js';
 
 const TIMEWEB_BASE_URL = 'https://api.timeweb.cloud/api/v1/cloud-ai/agents';
 
@@ -19,7 +20,15 @@ export class TimewebAdapter implements InferenceAdapter {
   ) {}
 
   async *stream(request: InferenceRequest): AsyncIterable<ChatStreamEvent> {
-    const agentId = this.config.agentIds[request.model];
+    const agentId = this.config.agentIds.get(request.model);
+
+    if (!agentId) {
+      throw new ChatServiceError(
+        CHAT_ERROR_CODE.INTERNAL_ERROR,
+        `Timeweb agent is not configured for model: ${request.model}`,
+        500,
+      );
+    }
 
     let response: Response;
 
@@ -70,13 +79,6 @@ export class TimewebAdapter implements InferenceAdapter {
       });
     }
   }
-}
-
-export function createTimewebAdapter(
-  source: NodeJS.ProcessEnv = process.env,
-  fetchImplementation: typeof fetch = fetch,
-): TimewebAdapter {
-  return new TimewebAdapter(loadTimewebConfig(source), fetchImplementation);
 }
 
 async function* readResponseBody(body: ReadableStream<Uint8Array>): AsyncGenerator<Uint8Array> {

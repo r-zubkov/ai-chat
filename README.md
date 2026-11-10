@@ -70,21 +70,18 @@ Backend разделён по ответственности:
 
 Adapters подключают backend к AI-провайдерам. Пока добавлен только adapter для Timeweb Cloud AI.
 
+Каждый adapter настраивается через переменные окружения. Ключи и ID берутся в панели провайдера, а
+список ID моделей находится в `packages/contracts/src/models/configs`.
+
 Для настройки Timeweb:
 
-- скопируйте `apps/api/src/adapters/timeweb/.env.example` в
-  `apps/api/src/adapters/timeweb/.env`
-- положите API key в `TIMEWEB_API_KEY`
-- положите ID агентов в переменные вида `TIMEWEB_AGENT_*_ID`, например в
-  `TIMEWEB_AGENT_GPT_5_1_ID`
-
-При запросе adapter использует agent ID выбранной модели. API key и agent ID хранятся только на
-backend.
+Для локального запуска скопируйте `apps/api/src/adapters/timeweb/.env.example` в
+`apps/api/src/adapters/timeweb/.env` и заполните `TIMEWEB_API_KEY` и `TIMEWEB_AGENT_IDS` данными из
+панели Timeweb Cloud.
 
 ### Contracts
 
-`@ai-chat/contracts` содержит список AI-моделей и структуры данных, которые одновременно нужны
-frontend и backend. Пакет вынесен отдельно, чтобы клиент и сервер использовали один контракт.
+`@ai-chat/contracts` содержит общие для frontend и backend конфиги AI-моделей, типы и константы.
 
 ## Минимальные требования
 
@@ -148,6 +145,7 @@ npm run format:check
 ## Конфигурация окружений
 
 - `apps/api/.env` - режим запуска, порт API и адрес frontend
+- `apps/api/src/adapters/timeweb/.env` - API key и карта Timeweb agent ID по model ID
 - `apps/web/proxy.conf.json` - proxy API + WebSocket на локальный backend
 
 В production настройки backend задаются через environment variables платформы. Конфигурация

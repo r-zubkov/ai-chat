@@ -10,6 +10,8 @@ export interface ChatCompletionResponse {
   content: string;
 }
 
+export type AvailableModelIdsResponse = ModelId[];
+
 export function isChatCompletionRequest(value: unknown): value is ChatCompletionRequest {
   if (!isRecord(value)) return false;
 
@@ -18,6 +20,10 @@ export function isChatCompletionRequest(value: unknown): value is ChatCompletion
 
 export function isChatCompletionResponse(value: unknown): value is ChatCompletionResponse {
   return isRecord(value) && typeof value['content'] === 'string';
+}
+
+export function isAvailableModelIdsResponse(value: unknown): value is AvailableModelIdsResponse {
+  return Array.isArray(value) && value.length > 0 && value.every(isModelId);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

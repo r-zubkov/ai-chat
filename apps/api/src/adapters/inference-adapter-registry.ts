@@ -1,6 +1,7 @@
-import { CHAT_ERROR_CODE, type Adapter } from '@ai-chat/contracts';
+import { CHAT_ERROR_CODE } from '@ai-chat/contracts';
 import { ChatServiceError } from '../chat/chat.error.js';
 import type { InferenceAdapter } from '../chat/inference-adapter.js';
+import type { Adapter } from './adapter.constants.js';
 
 export class InferenceAdapterRegistry {
   private readonly adapters: ReadonlyMap<Adapter, InferenceAdapter>;

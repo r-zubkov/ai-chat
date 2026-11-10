@@ -1,23 +1,10 @@
-import {
-  DEEPSEEK_MODELS,
-  GEMINI_MODELS,
-  GPT_MODELS,
-  GROK_MODELS,
-  type ModelId,
-} from '@ai-chat/contracts';
+import { isModelId, type ModelId } from '@ai-chat/contracts';
 import { config as loadDotenv } from 'dotenv';
 import { basename, dirname, resolve } from 'node:path';
 
-const TIMEWEB_AGENT_ENVIRONMENT_KEYS = {
-  [GROK_MODELS.GROK_4_FAST.id]: 'TIMEWEB_AGENT_GROK_4_FAST_ID',
-  [DEEPSEEK_MODELS.DEEPSEEK_V_3_2.id]: 'TIMEWEB_AGENT_DEEPSEEK_V3_2_ID',
-  [GEMINI_MODELS.GEMINI_3_FLASH_PREVIEW.id]: 'TIMEWEB_AGENT_GEMINI_3_FLASH_PREVIEW_ID',
-  [GPT_MODELS.GPT_5_1.id]: 'TIMEWEB_AGENT_GPT_5_1_ID',
-} as const satisfies Record<ModelId, string>;
-
 export interface TimewebConfig {
   readonly apiKey: string;
-  readonly agentIds: Readonly<Record<ModelId, string>>;
+  readonly agentIds: ReadonlyMap<ModelId, string>;
 }
 
 export function loadTimewebConfig(source: NodeJS.ProcessEnv = process.env): TimewebConfig {
@@ -25,17 +12,40 @@ export function loadTimewebConfig(source: NodeJS.ProcessEnv = process.env): Time
     loadDotenv({ path: resolveTimewebEnvironmentPath() });
   }
 
-  const agentIds = Object.fromEntries(
-    Object.entries(TIMEWEB_AGENT_ENVIRONMENT_KEYS).map(([modelId, environmentKey]) => [
-      modelId,
-      requiredEnvironmentValue(source, environmentKey),
-    ]),
-  ) as Record<ModelId, string>;
-
   return Object.freeze({
     apiKey: requiredEnvironmentValue(source, 'TIMEWEB_API_KEY'),
-    agentIds: Object.freeze(agentIds),
+    agentIds: parseAgentIds(requiredEnvironmentValue(source, 'TIMEWEB_AGENT_IDS')),
   });
+}
+
+function parseAgentIds(serialized: string): ReadonlyMap<ModelId, string> {
+  let value: unknown;
+
+  try {
+    value = JSON.parse(serialized) as unknown;
+  } catch {
+    throw new Error('Invalid TIMEWEB_AGENT_IDS: expected a JSON object');
+  }
+
+  if (!isRecord(value) || Object.keys(value).length === 0) {
+    throw new Error('Invalid TIMEWEB_AGENT_IDS: expected a non-empty JSON object');
+  }
+
+  const agentIds = new Map<ModelId, string>();
+
+  for (const [modelId, agentId] of Object.entries(value)) {
+    if (!isModelId(modelId)) {
+      throw new Error(`Unknown model in TIMEWEB_AGENT_IDS: ${modelId}`);
+    }
+
+    if (typeof agentId !== 'string' || !agentId.trim()) {
+      throw new Error(`Invalid Timeweb agent ID for model: ${modelId}`);
+    }
+
+    agentIds.set(modelId, agentId.trim());
+  }
+
+  return agentIds;
 }
 
 function resolveTimewebEnvironmentPath(): string {
@@ -52,4 +62,8 @@ function requiredEnvironmentValue(source: NodeJS.ProcessEnv, key: string): strin
   const value = source[key]?.trim();
   if (!value) throw new Error(`Missing required Timeweb environment variable: ${key}`);
   return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

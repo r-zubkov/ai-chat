@@ -1,4 +1,5 @@
-import type { Adapter, ChatRequestMessage, ModelId } from '@ai-chat/contracts';
+import type { ChatRequestMessage, ModelId } from '@ai-chat/contracts';
+import type { Adapter } from '../adapters/adapter.constants.js';
 
 export type InferenceMessage = ChatRequestMessage;
 

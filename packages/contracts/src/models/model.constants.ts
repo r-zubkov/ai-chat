@@ -1,9 +1,3 @@
-export const ADAPTER = {
-  TIMEWEB: 'timeweb',
-} as const;
-
-export type Adapter = (typeof ADAPTER)[keyof typeof ADAPTER];
-
 export const MODEL_FAMILY = {
   CLAUDE: 'claude',
   GROK: 'grok',

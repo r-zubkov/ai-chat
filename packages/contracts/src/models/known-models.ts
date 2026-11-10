@@ -16,6 +16,8 @@ const MODEL_CONFIGS = {
 
 export type KnownModelDefinition = (typeof MODEL_CONFIGS)[keyof typeof MODEL_CONFIGS];
 export type KnownModelId = KnownModelDefinition['id'];
+export type ModelDefinition = KnownModelDefinition;
+export type ModelId = KnownModelId;
 
 type KnownModelMap = {
   readonly [TModel in KnownModelDefinition as TModel['id']]: TModel;
@@ -27,4 +29,12 @@ export const KNOWN_MODELS = Object.freeze(
 
 export function getKnownModelDefinition(model: string): KnownModelDefinition | undefined {
   return KNOWN_MODELS[model as KnownModelId];
+}
+
+export function getModelDefinition(model: ModelId): ModelDefinition {
+  return KNOWN_MODELS[model];
+}
+
+export function isModelId(value: unknown): value is ModelId {
+  return typeof value === 'string' && Object.hasOwn(KNOWN_MODELS, value);
 }

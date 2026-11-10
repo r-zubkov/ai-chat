@@ -45,7 +45,7 @@
 
 <ng-template #dropdown>
   <tui-data-list>
-    @for (model of selectModel.models; track model) {
+    @for (model of selectModel.models(); track model.id) {
       <button tuiOption type="button" (click)="onClick(model.id)">
         {{ model.label }}
         @if (itemIsActive(model.id)) {

@@ -1,6 +1,4 @@
 export {
-  ADAPTER,
-  AVAILABLE_MODELS,
   CLAUDE_MODELS,
   DEEPSEEK_MODELS,
   GEMINI_MODELS,
@@ -14,7 +12,6 @@ export {
   isModelId,
 } from './models/index.js';
 export type {
-  Adapter,
   KnownModelDefinition,
   KnownModelId,
   ModelDefinition,
@@ -25,8 +22,16 @@ export type {
 export { isChatRequestMessage, isChatRequestMessages } from './messages.js';
 export type { ChatRequestMessage, ChatRole } from './messages.js';
 
-export { isChatCompletionRequest, isChatCompletionResponse } from './http.js';
-export type { ChatCompletionRequest, ChatCompletionResponse } from './http.js';
+export {
+  isAvailableModelIdsResponse,
+  isChatCompletionRequest,
+  isChatCompletionResponse,
+} from './http.js';
+export type {
+  AvailableModelIdsResponse,
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+} from './http.js';
 
 export { CHAT_ERROR_CODE, isChatErrorPayload } from './errors.js';
 export type { ChatErrorCode, ChatErrorPayload } from './errors.js';

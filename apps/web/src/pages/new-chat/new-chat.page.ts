@@ -29,7 +29,8 @@ export class NewChatPage implements OnInit {
   ngOnInit(): void {
     this.chatStore.setActive(null);
     this.messageStore.clearState();
-    this.settings.setCurrentModel(this.settings.globalCurrentModel());
+    const globalModel = this.settings.globalCurrentModel();
+    if (globalModel) this.settings.setCurrentModel(globalModel);
     this.shellUi.closeSidebarOnMobile();
   }
 
