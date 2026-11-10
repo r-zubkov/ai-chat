@@ -1,15 +1,20 @@
 {
-  "name": "ai-chat",
+  "name": "ai-chat-monorepo",
   "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve -c local",
-    "build": "ng build -c local",
-    "build:prod": "ng build -c production",
-    "watch": "ng build --watch -c local",
-    "test": "ng test",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "dev": "npm run build -w @ai-chat/contracts && concurrently -k -n contracts,api,web -c yellow,cyan,green \"npm run dev -w @ai-chat/contracts\" \"npm run dev -w @ai-chat/api\" \"npm run start -w @ai-chat/web\"",
+    "build": "npm run build -w @ai-chat/contracts && npm run build -w @ai-chat/web && npm run build -w @ai-chat/api && node scripts/assemble-dist.mjs",
+    "start": "node dist/server/server.js",
+    "lint": "npm run lint -w @ai-chat/contracts && npm run lint -w @ai-chat/api && npm run lint -w @ai-chat/web",
+    "typecheck": "npm run typecheck -w @ai-chat/contracts && npm run typecheck -w @ai-chat/api && npm run typecheck -w @ai-chat/web",
+    "pretest": "npm run build -w @ai-chat/contracts",
+    "test": "npm run test -w @ai-chat/contracts && npm run test -w @ai-chat/api && npm run test -w @ai-chat/web",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "prepare": "husky"
@@ -26,43 +31,28 @@
       }
     ]
   },
-  "private": true,
   "lint-staged": {
     "*.{ts,html}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{js,json,css,scss,less,md,yml,yaml}": "prettier --write"
-  },
-  "dependencies": {
-    "@angular/common": "^22.2.5",
-    "@angular/compiler": "^22.2.5",
-    "@angular/core": "^22.2.5",
-    "@angular/forms": "^22.2.5",
-    "@angular/platform-browser": "^22.2.5",
-    "@angular/router": "^22.2.5",
-    "@angular/service-worker": "^22.2.5",
-    "@ngrx/signals": "^22.0.1",
-    "@taiga-ui/cdk": "^5.31.0",
-    "@taiga-ui/core": "^5.31.0",
-    "@taiga-ui/event-plugins": "^5.1.0",
-    "@taiga-ui/icons": "^5.31.0",
-    "@taiga-ui/kit": "^5.31.0",
-    "dexie": "^4.2.1",
-    "highlight.js": "^11.11.1",
-    "markdown-it": "^14.1.0",
-    "rxjs": "~7.8.0",
-    "socket.io-client": "^4.8.1",
-    "tslib": "^2.3.0"
+    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "prettier --write"
   },
   "devDependencies": {
     "@angular/build": "^22.2.6",
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.5",
     "@eslint/js": "^9.39.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
     "@types/jasmine": "~5.1.0",
     "@types/markdown-it": "^14.1.2",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.0",
+    "@types/supertest": "^6.0.3",
     "angular-eslint": "^22.6.0",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.27.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
@@ -77,9 +67,12 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "less": "^4.2.0",
-    "lint-staged": "^16.3.1",
+    "lint-staged": "16.2.7",
     "prettier": "^3.8.1",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^4.0.8"
   }
 }
