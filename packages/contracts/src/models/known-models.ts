@@ -1,13 +1,17 @@
+import { CLAUDE_MODELS } from './configs/claude.models.js';
 import { DEEPSEEK_MODELS } from './configs/deepseek.models.js';
 import { GEMINI_MODELS } from './configs/gemini.models.js';
 import { GPT_MODELS } from './configs/gpt.models.js';
 import { GROK_MODELS } from './configs/grok.models.js';
+import { QWEN_MODELS } from './configs/qwen.models.js';
 
 const MODEL_CONFIGS = {
+  ...CLAUDE_MODELS,
   ...GROK_MODELS,
   ...DEEPSEEK_MODELS,
   ...GEMINI_MODELS,
   ...GPT_MODELS,
+  ...QWEN_MODELS,
 } as const;
 
 export type KnownModelDefinition = (typeof MODEL_CONFIGS)[keyof typeof MODEL_CONFIGS];

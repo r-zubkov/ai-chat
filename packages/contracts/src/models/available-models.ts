@@ -10,7 +10,7 @@ export const AVAILABLE_MODELS = registerAvailableModels([
     adapter: ADAPTER.TIMEWEB,
     models: [
       GROK_MODELS.GROK_4_FAST,
-      DEEPSEEK_MODELS.DEEPSEEK_V3_2,
+      DEEPSEEK_MODELS.DEEPSEEK_V_3_2,
       GEMINI_MODELS.GEMINI_3_FLASH_PREVIEW,
       GPT_MODELS.GPT_5_1,
     ],
