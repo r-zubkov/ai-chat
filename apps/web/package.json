@@ -11,6 +11,13 @@
     "typecheck": "ngc -p tsconfig.app.json && tsc -p tsconfig.spec.json --noEmit",
     "test": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
   },
+  "lint-staged": {
+    "*.{ts,html}": [
+      "node ../../node_modules/eslint/bin/eslint.js --fix",
+      "node ../../node_modules/prettier/bin/prettier.cjs --write"
+    ],
+    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "node ../../node_modules/prettier/bin/prettier.cjs --write"
+  },
   "dependencies": {
     "@ai-chat/contracts": "1.0.0",
     "@angular/common": "^22.2.5",

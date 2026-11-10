@@ -32,11 +32,7 @@
     ]
   },
   "lint-staged": {
-    "*.{ts,html}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "prettier --write"
+    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "node ./node_modules/prettier/bin/prettier.cjs --write"
   },
   "devDependencies": {
     "@angular/build": "^22.2.6",

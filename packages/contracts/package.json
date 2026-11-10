@@ -19,5 +19,12 @@
     "lint": "eslint src test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "node ../../node_modules/eslint/bin/eslint.js --fix",
+      "node ../../node_modules/prettier/bin/prettier.cjs --write"
+    ],
+    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "node ../../node_modules/prettier/bin/prettier.cjs --write"
   }
 }
