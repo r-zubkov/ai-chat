@@ -1,8 +1,12 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const workspaceRoot = resolve(import.meta.dirname, '..');
-const source = resolve(workspaceRoot, '../../node_modules/@taiga-ui/icons/src');
+const iconsPackageRoot = dirname(
+  fileURLToPath(import.meta.resolve('@taiga-ui/icons/package.json')),
+);
+const source = resolve(iconsPackageRoot, 'src');
 const target = resolve(workspaceRoot, '.generated/taiga-icons');
 
 await rm(target, { recursive: true, force: true });
