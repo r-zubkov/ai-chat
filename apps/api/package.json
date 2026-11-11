@@ -1,6 +1,6 @@
 {
   "name": "@ai-chat/api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
     "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "node ../../node_modules/prettier/bin/prettier.cjs --write"
   },
   "dependencies": {
-    "@ai-chat/contracts": "1.0.0",
+    "@ai-chat/contracts": "2.0.0",
     "dotenv": "^16.4.0",
     "express": "^4.19.0",
     "morgan": "^1.10.0",

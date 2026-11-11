@@ -1,6 +1,6 @@
 {
   "name": "@ai-chat/web",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "prestart": "node scripts/prepare-assets.mjs",
@@ -19,7 +19,7 @@
     "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "node ../../node_modules/prettier/bin/prettier.cjs --write"
   },
   "dependencies": {
-    "@ai-chat/contracts": "1.0.0",
+    "@ai-chat/contracts": "2.0.0",
     "@angular/common": "^22.2.5",
     "@angular/compiler": "^22.2.5",
     "@angular/core": "^22.2.5",
