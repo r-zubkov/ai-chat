@@ -1,5 +1,5 @@
 {
-  "name": "ai-chat-monorepo",
+  "name": "ai-chat",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -8,9 +8,10 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "npm run dev",
     "dev": "npm run build -w @ai-chat/contracts && concurrently -k -n contracts,api,web -c yellow,cyan,green \"npm run dev -w @ai-chat/contracts\" \"npm run dev -w @ai-chat/api\" \"npm run start -w @ai-chat/web\"",
     "build": "npm run build -w @ai-chat/contracts && npm run build -w @ai-chat/web && npm run build -w @ai-chat/api && node scripts/assemble-dist.mjs",
-    "start": "node dist/server/server.js",
+    "preview": "node dist/server.mjs",
     "lint": "npm run lint -w @ai-chat/contracts && npm run lint -w @ai-chat/api && npm run lint -w @ai-chat/web",
     "typecheck": "npm run typecheck -w @ai-chat/contracts && npm run typecheck -w @ai-chat/api && npm run typecheck -w @ai-chat/web",
     "pretest": "npm run build -w @ai-chat/contracts",
@@ -39,7 +40,6 @@
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.5",
     "@eslint/js": "^9.39.3",
-    "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/jasmine": "~5.1.0",
     "@types/markdown-it": "^14.1.2",

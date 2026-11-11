@@ -1,13 +1,13 @@
+import { loadAdapterEnvironment } from './adapters/adapter-environment.js';
 import { TimewebAdapter } from './adapters/timeweb/timeweb.adapter.js';
 import { loadTimewebConfig } from './adapters/timeweb/timeweb.config.js';
 import { createApplication } from './app.js';
-import { loadApiEnvironment, readEnvironment } from './config/environment.js';
+import { environment } from './environments/environment.js';
 import { createAvailableModels } from './models/available-models.js';
 
 async function main(): Promise<void> {
-  loadApiEnvironment();
-  const environment = readEnvironment();
-  const timewebConfig = loadTimewebConfig();
+  const adapterEnvironment = await loadAdapterEnvironment();
+  const timewebConfig = loadTimewebConfig(adapterEnvironment);
   const timewebAdapter = new TimewebAdapter(timewebConfig);
   const availableModels = createAvailableModels([
     { adapter: timewebAdapter.id, modelIds: Array.from(timewebConfig.agentIds.keys()) },

@@ -8,7 +8,5 @@ const apiBuild = resolve(repositoryRoot, 'apps/api/dist');
 
 await rm(outputRoot, { recursive: true, force: true });
 await mkdir(resolve(outputRoot, 'public'), { recursive: true });
-await mkdir(resolve(outputRoot, 'server'), { recursive: true });
 await cp(webBuild, resolve(outputRoot, 'public'), { recursive: true });
-await cp(resolve(apiBuild, 'server.js'), resolve(outputRoot, 'server/server.js'));
-await cp(resolve(apiBuild, 'server.js.map'), resolve(outputRoot, 'server/server.js.map'));
+await cp(resolve(apiBuild, 'server.mjs'), resolve(outputRoot, 'server.mjs'));

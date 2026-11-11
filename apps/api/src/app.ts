@@ -1,5 +1,4 @@
 import { CHAT_ERROR_CODE, SOCKET_PATH } from '@ai-chat/contracts';
-import cors from 'cors';
 import express, { type Express } from 'express';
 import { createServer, type Server as HttpServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
@@ -8,7 +7,7 @@ import { Server as SocketIoServer } from 'socket.io';
 import { InferenceAdapterRegistry } from './adapters/inference-adapter-registry.js';
 import { ChatService } from './chat/chat.service.js';
 import type { InferenceAdapter } from './chat/inference-adapter.js';
-import type { ApiEnvironment } from './config/environment.js';
+import type { ApiEnvironment } from './environments/environment.model.js';
 import type { AvailableModels } from './models/available-models.js';
 import { registerChatRoute } from './transports/http/chat.route.js';
 import { registerModelsRoute } from './transports/http/models.route.js';
@@ -30,10 +29,6 @@ export function createApplication(
   const httpServer = createServer(app);
   const io = new SocketIoServer<ClientToServerEvents, ServerToClientEvents>(httpServer, {
     path: SOCKET_PATH,
-    cors: {
-      origin: environment.corsOrigin,
-      methods: ['GET', 'POST'],
-    },
   });
   const chatService = new ChatService(
     new InferenceAdapterRegistry(inferenceAdapters),
@@ -41,14 +36,7 @@ export function createApplication(
   );
 
   app.use(express.json({ limit: '5mb' }));
-  if (environment.mode === 'dev') {
-    app.use(
-      cors({
-        origin: environment.corsOrigin,
-        methods: ['GET', 'POST', 'OPTIONS'],
-        allowedHeaders: ['Content-Type'],
-      }),
-    );
+  if (!environment.production) {
     app.use(morgan('dev'));
   }
 
@@ -63,10 +51,11 @@ export function createApplication(
     });
   });
 
-  const publicDirectory = fileURLToPath(new URL('../public', import.meta.url));
+  const publicDirectory = fileURLToPath(new URL('./public', import.meta.url));
+  const indexFile = fileURLToPath(new URL('./public/index.html', import.meta.url));
   app.use(express.static(publicDirectory));
   app.get('*', (_request, response) => {
-    response.sendFile(fileURLToPath(new URL('../public/index.html', import.meta.url)));
+    response.sendFile(indexFile);
   });
 
   return { app, httpServer, io };

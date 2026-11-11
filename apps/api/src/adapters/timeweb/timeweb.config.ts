@@ -1,20 +1,18 @@
 import { isModelId, type ModelId } from '@ai-chat/contracts';
-import { config as loadDotenv } from 'dotenv';
-import { basename, dirname, resolve } from 'node:path';
+import type { AdapterEnvironment } from '../adapter-environment.js';
+
+const API_KEY_ENVIRONMENT_KEY = 'AI_CHAT_TIMEWEB_API_KEY';
+const AGENT_IDS_ENVIRONMENT_KEY = 'AI_CHAT_TIMEWEB_AGENT_IDS';
 
 export interface TimewebConfig {
   readonly apiKey: string;
   readonly agentIds: ReadonlyMap<ModelId, string>;
 }
 
-export function loadTimewebConfig(source: NodeJS.ProcessEnv = process.env): TimewebConfig {
-  if (source === process.env && source['ENV'] !== 'test') {
-    loadDotenv({ path: resolveTimewebEnvironmentPath() });
-  }
-
+export function loadTimewebConfig(source: AdapterEnvironment): TimewebConfig {
   return Object.freeze({
-    apiKey: requiredEnvironmentValue(source, 'TIMEWEB_API_KEY'),
-    agentIds: parseAgentIds(requiredEnvironmentValue(source, 'TIMEWEB_AGENT_IDS')),
+    apiKey: requiredEnvironmentValue(source, API_KEY_ENVIRONMENT_KEY),
+    agentIds: parseAgentIds(requiredEnvironmentValue(source, AGENT_IDS_ENVIRONMENT_KEY)),
   });
 }
 
@@ -24,18 +22,18 @@ function parseAgentIds(serialized: string): ReadonlyMap<ModelId, string> {
   try {
     value = JSON.parse(serialized) as unknown;
   } catch {
-    throw new Error('Invalid TIMEWEB_AGENT_IDS: expected a JSON object');
+    throw new Error(`Invalid ${AGENT_IDS_ENVIRONMENT_KEY}: expected a JSON object`);
   }
 
   if (!isRecord(value) || Object.keys(value).length === 0) {
-    throw new Error('Invalid TIMEWEB_AGENT_IDS: expected a non-empty JSON object');
+    throw new Error(`Invalid ${AGENT_IDS_ENVIRONMENT_KEY}: expected a non-empty JSON object`);
   }
 
   const agentIds = new Map<ModelId, string>();
 
   for (const [modelId, agentId] of Object.entries(value)) {
     if (!isModelId(modelId)) {
-      throw new Error(`Unknown model in TIMEWEB_AGENT_IDS: ${modelId}`);
+      throw new Error(`Unknown model in ${AGENT_IDS_ENVIRONMENT_KEY}: ${modelId}`);
     }
 
     if (typeof agentId !== 'string' || !agentId.trim()) {
@@ -48,17 +46,7 @@ function parseAgentIds(serialized: string): ReadonlyMap<ModelId, string> {
   return agentIds;
 }
 
-function resolveTimewebEnvironmentPath(): string {
-  const workingDirectory = process.cwd();
-  const apiWorkspace =
-    basename(workingDirectory) === 'api' && basename(dirname(workingDirectory)) === 'apps'
-      ? workingDirectory
-      : resolve(workingDirectory, 'apps/api');
-
-  return resolve(apiWorkspace, 'src/adapters/timeweb/.env');
-}
-
-function requiredEnvironmentValue(source: NodeJS.ProcessEnv, key: string): string {
+function requiredEnvironmentValue(source: AdapterEnvironment, key: string): string {
   const value = source[key]?.trim();
   if (!value) throw new Error(`Missing required Timeweb environment variable: ${key}`);
   return value;

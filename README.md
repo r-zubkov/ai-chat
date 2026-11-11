@@ -60,7 +60,7 @@ entity stores - за состояние данных в приложении.
 
 Backend разделён по ответственности:
 
-- `config` - конфигурация API
+- `environments` - development и production-конфигурация API
 - `prompts` - системные prompts для разных семейств моделей
 - `chat` - обработка запросов и общая логика чата
 - `adapters` - интеграции с AI-провайдерами
@@ -70,14 +70,15 @@ Backend разделён по ответственности:
 
 Adapters подключают backend к AI-провайдерам. Пока добавлен только adapter для Timeweb Cloud AI.
 
-Каждый adapter настраивается через переменные окружения. Ключи и ID берутся в панели провайдера, а
-список ID моделей находится в `packages/contracts/src/models/configs`.
+Adapters настраиваются из переменных окружения либо из явно указанного общего env-файла. Ключи и ID
+берутся в панели провайдера, а список ID моделей находится в
+`packages/contracts/src/models/configs`.
 
 Для настройки Timeweb:
 
-Для локального запуска скопируйте `apps/api/src/adapters/timeweb/.env.example` в
-`apps/api/src/adapters/timeweb/.env` и заполните `TIMEWEB_API_KEY` и `TIMEWEB_AGENT_IDS` данными из
-панели Timeweb Cloud.
+Для локального запуска скопируйте `apps/api/src/adapters/.env.example` в
+`apps/api/src/adapters/.env` и заполните `AI_CHAT_TIMEWEB_API_KEY` и
+`AI_CHAT_TIMEWEB_AGENT_IDS` данными из панели Timeweb Cloud.
 
 ### Contracts
 
@@ -100,12 +101,12 @@ npm install
 
 ### 2. Настройка backend
 
-Создайте общий файл конфигурации:
+Создайте локальный файл конфигурации adapters:
 
-- `apps/api/.env.example` → `apps/api/.env`
+- `apps/api/src/adapters/.env.example` → `apps/api/src/adapters/.env`
 
-В нём настраиваются режим запуска, порт API и адрес frontend. Timeweb настраивается отдельно в
-разделе `Adapters`.
+API development environment уже настроен на порт `5000`. В файле adapters задаются ключи и
+настройки AI-адаптеров.
 
 ### 3. Запуск в локальном окружении
 
@@ -120,13 +121,14 @@ npm run dev
 
 ```bash
 # локальная разработка
+npm start
 npm run dev
 
 # production-сборка всего приложения
 npm run build
 
-# запуск собранного приложения
-npm start
+# локальная проверка собранного приложения
+npm run preview
 
 # линтинг
 npm run lint
@@ -144,12 +146,14 @@ npm run format:check
 
 ## Конфигурация окружений
 
-- `apps/api/.env` - режим запуска, порт API и адрес frontend
-- `apps/api/src/adapters/timeweb/.env` - API key и карта Timeweb agent ID по model ID
+- `apps/api/src/environments/environment.ts` - development environment API
+- `apps/api/src/environments/environment.prod.ts` - production environment API
+- `apps/api/src/adapters/.env` - ключи и настройки AI-адаптеров для локального запуска
 - `apps/web/proxy.conf.json` - proxy API + WebSocket на локальный backend
 
-В production настройки backend задаются через environment variables платформы. Конфигурация
-AI-провайдеров описана в блоке `Adapters`.
+В production adapter-настройки задаются через environment variables платформы либо через
+`--adapters-env-file=/absolute/path/adapters.env`. В File mode значения читаются только из указанного
+файла и не объединяются с environment процесса.
 
 ## Структура проекта
 
@@ -165,7 +169,7 @@ apps/
       shared/
   api/
     src/
-      config/
+      environments/
       prompts/
       chat/
       adapters/
@@ -176,5 +180,6 @@ packages/
 
 ## Production
 
-- `npm run build` - сборка contracts + frontend + backend в `dist`
-- `npm start` - запуск API + Socket.IO + Angular-приложения одним Node.js server
+- `npm run build` - сборка contracts + frontend + backend в `dist/public` и `dist/server.mjs`
+- `node dist/server.mjs` - запуск через adapter-настройки из environment процесса
+- `node dist/server.mjs --adapters-env-file=/absolute/path/adapters.env` - запуск через внешний файл
