@@ -1,0 +1,40 @@
+import { CLAUDE_MODELS } from './configs/claude.models.js';
+import { DEEPSEEK_MODELS } from './configs/deepseek.models.js';
+import { GEMINI_MODELS } from './configs/gemini.models.js';
+import { GPT_MODELS } from './configs/gpt.models.js';
+import { GROK_MODELS } from './configs/grok.models.js';
+import { QWEN_MODELS } from './configs/qwen.models.js';
+
+const MODEL_CONFIGS = {
+  ...CLAUDE_MODELS,
+  ...GROK_MODELS,
+  ...DEEPSEEK_MODELS,
+  ...GEMINI_MODELS,
+  ...GPT_MODELS,
+  ...QWEN_MODELS,
+} as const;
+
+export type KnownModelDefinition = (typeof MODEL_CONFIGS)[keyof typeof MODEL_CONFIGS];
+export type KnownModelId = KnownModelDefinition['id'];
+export type ModelDefinition = KnownModelDefinition;
+export type ModelId = KnownModelId;
+
+type KnownModelMap = {
+  readonly [TModel in KnownModelDefinition as TModel['id']]: TModel;
+};
+
+export const KNOWN_MODELS = Object.freeze(
+  Object.fromEntries(Object.values(MODEL_CONFIGS).map((model) => [model.id, model])),
+) as KnownModelMap;
+
+export function getKnownModelDefinition(model: string): KnownModelDefinition | undefined {
+  return KNOWN_MODELS[model as KnownModelId];
+}
+
+export function getModelDefinition(model: ModelId): ModelDefinition {
+  return KNOWN_MODELS[model];
+}
+
+export function isModelId(value: unknown): value is ModelId {
+  return typeof value === 'string' && Object.hasOwn(KNOWN_MODELS, value);
+}

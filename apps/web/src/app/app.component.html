@@ -1,0 +1,37 @@
+<tui-root>
+  @if (appState.initialDataLoading()) {
+    <div class="app-initialization flex items-center justify-center">
+      <tui-loader size="l" [inheritColor]="true" />
+    </div>
+  } @else if (appState.initialDataError()) {
+    <div class="app-initialization app-initialization_error flex items-center justify-center">
+      <p class="text-base">При загрузке приложения произошла ошибка</p>
+      <button
+        tuiButton
+        type="button"
+        appearance="secondary"
+        size="m"
+        (click)="retryInitialDataLoad()"
+      >
+        Повторить
+      </button>
+    </div>
+  } @else if (appState.initialDataReady()) {
+    <div class="app-root flex" [class.mobile]="shellUi.isMobile()">
+      @if (shellUi.sidebarOpen()) {
+        <aside class="sidebar">
+          <app-chat-sidebar></app-chat-sidebar>
+        </aside>
+      }
+      <div class="app-body flex flex-1 flex-col">
+        <app-chat-header></app-chat-header>
+
+        <main class="chat-container flex flex-1 justify-center">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </div>
+  } @else {
+    <div class="app-initialization"></div>
+  }
+</tui-root>

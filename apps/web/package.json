@@ -1,0 +1,68 @@
+{
+  "name": "@ai-chat/web",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "prestart": "node scripts/prepare-assets.mjs",
+    "start": "ng serve -c local",
+    "prebuild": "node scripts/prepare-assets.mjs",
+    "build": "ng build -c production",
+    "lint": "eslint .",
+    "typecheck": "ngc -p tsconfig.app.json && tsc -p tsconfig.spec.json --noEmit",
+    "test": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
+  },
+  "lint-staged": {
+    "*.{ts,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,mjs,json,css,scss,less,md,yml,yaml}": "prettier --write"
+  },
+  "dependencies": {
+    "@ai-chat/contracts": "2.0.0",
+    "@angular/common": "^22.2.5",
+    "@angular/compiler": "^22.2.5",
+    "@angular/core": "^22.2.5",
+    "@angular/forms": "^22.2.5",
+    "@angular/platform-browser": "^22.2.5",
+    "@angular/router": "^22.2.5",
+    "@angular/service-worker": "^22.2.5",
+    "@ngrx/signals": "^22.0.1",
+    "@taiga-ui/cdk": "^5.31.0",
+    "@taiga-ui/core": "^5.31.0",
+    "@taiga-ui/event-plugins": "^5.1.0",
+    "@taiga-ui/icons": "^5.31.0",
+    "@taiga-ui/kit": "^5.31.0",
+    "dexie": "^4.2.1",
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.3.3",
+    "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.4",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.6",
+    "@angular/cli": "^22.2.6",
+    "@angular/compiler-cli": "^22.2.5",
+    "@eslint/js": "^9.39.3",
+    "@types/jasmine": "~5.1.0",
+    "@types/markdown-it": "^14.1.2",
+    "angular-eslint": "^22.6.0",
+    "eslint": "^9.39.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-boundaries": "^4.2.2",
+    "eslint-plugin-import": "^2.32.0",
+    "istanbul-lib-instrument": "^6.0.3",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "less": "^4.2.0",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1"
+  }
+}
