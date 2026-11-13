@@ -20,10 +20,15 @@ export interface ApiApplication {
   readonly io: SocketIoServer<ClientToServerEvents, ServerToClientEvents>;
 }
 
+export interface ApiApplicationOptions {
+  readonly serveStatic?: boolean;
+}
+
 export function createApplication(
   environment: ApiEnvironment,
   inferenceAdapters: readonly InferenceAdapter[],
   availableModels: AvailableModels,
+  options: ApiApplicationOptions = {},
 ): ApiApplication {
   const app = express();
   const httpServer = createServer(app);
@@ -51,12 +56,14 @@ export function createApplication(
     });
   });
 
-  const publicDirectory = fileURLToPath(new URL('./public', import.meta.url));
-  const indexFile = fileURLToPath(new URL('./public/index.html', import.meta.url));
-  app.use(express.static(publicDirectory));
-  app.get('*', (_request, response) => {
-    response.sendFile(indexFile);
-  });
+  if (options.serveStatic) {
+    const publicDirectory = fileURLToPath(new URL('./public', import.meta.url));
+    const indexFile = fileURLToPath(new URL('./public/index.html', import.meta.url));
+    app.use(express.static(publicDirectory));
+    app.get('*', (_request, response) => {
+      response.sendFile(indexFile);
+    });
+  }
 
   return { app, httpServer, io };
 }

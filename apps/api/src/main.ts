@@ -4,9 +4,13 @@ import { loadTimewebConfig } from './adapters/timeweb/timeweb.config.js';
 import { createApplication } from './app.js';
 import { environment } from './environments/environment.js';
 import { createAvailableModels } from './models/available-models.js';
+import { parseServerArguments } from './server-arguments.js';
 
 async function main(): Promise<void> {
-  const adapterEnvironment = await loadAdapterEnvironment();
+  const serverArguments = parseServerArguments();
+  const adapterEnvironment = await loadAdapterEnvironment(
+    serverArguments.adapterEnvironmentArguments,
+  );
   const timewebConfig = loadTimewebConfig(adapterEnvironment);
   const timeweb = timewebConfig
     ? {
@@ -21,6 +25,7 @@ async function main(): Promise<void> {
     environment,
     timeweb ? [timeweb.adapter] : [],
     availableModels,
+    { serveStatic: serverArguments.serveStatic },
   );
 
   await new Promise<void>((resolve, reject) => {

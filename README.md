@@ -112,6 +112,9 @@ Backend подключается к AI-провайдерам через ада�
 Для загрузки конфигурации из файла передайте серверу аргумент `--adapters-env-file=<path>`. Без него
 используются переменные окружения процесса. В файловом режиме переменные процесса не подмешиваются.
 
+Аргумент `--serve-static` включает раздачу собранного frontend и SPA fallback через Express. Без него
+backend обслуживает только API и Socket.IO; этот режим предназначен в том числе для запуска за Nginx.
+
 #### Timeweb Cloud AI
 
 Укажите в env-файле:
@@ -163,8 +166,10 @@ npm run format:check
 ## Production
 
 - `npm run build` - сборка contracts + frontend + backend в `dist/public` и `dist/server.mjs`
-- `node dist/server.mjs` - запуск через настройки адаптеров из environment процесса
-- `node dist/server.mjs --adapters-env-file=/absolute/path/adapters.env` - запуск через внешний файл
+- `node dist/server.mjs` - запуск только API и Socket.IO (например, за Nginx)
+- `node dist/server.mjs --serve-static` - запуск API и frontend через Express
+- `node dist/server.mjs --serve-static --adapters-env-file=/absolute/path/adapters.env` - запуск frontend
+  через Express с настройками адаптеров из внешнего файла
 
 ## Структура проекта
 

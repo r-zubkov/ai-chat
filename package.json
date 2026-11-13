@@ -11,7 +11,7 @@
     "start": "npm run dev",
     "dev": "npm run build -w @ai-chat/contracts && concurrently -k -n contracts,api,web -c yellow,cyan,green \"npm run dev -w @ai-chat/contracts\" \"npm run dev -w @ai-chat/api\" \"npm run start -w @ai-chat/web\"",
     "build": "npm run build -w @ai-chat/contracts && npm run build -w @ai-chat/web && npm run build -w @ai-chat/api && node scripts/assemble-dist.mjs",
-    "preview": "node dist/server.mjs",
+    "preview": "node dist/server.mjs --serve-static",
     "lint": "npm run lint -w @ai-chat/contracts && npm run lint -w @ai-chat/api && npm run lint -w @ai-chat/web",
     "typecheck": "npm run typecheck -w @ai-chat/contracts && npm run typecheck -w @ai-chat/api && npm run typecheck -w @ai-chat/web",
     "pretest": "npm run build -w @ai-chat/contracts",
