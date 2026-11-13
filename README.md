@@ -66,20 +66,6 @@ Backend разделён по ответственности:
 - `adapters` - интеграции с AI-провайдерами
 - `transports` - HTTP и Socket.IO-интерфейсы
 
-#### Adapters
-
-Adapters подключают backend к AI-провайдерам. Пока добавлен только adapter для Timeweb Cloud AI.
-
-Adapters настраиваются из переменных окружения либо из явно указанного общего env-файла. Ключи и ID
-берутся в панели провайдера, а список ID моделей находится в
-`packages/contracts/src/models/configs`.
-
-Для настройки Timeweb:
-
-Для локального запуска скопируйте `apps/api/src/adapters/.env.example` в
-`apps/api/src/adapters/.env` и заполните `AI_CHAT_TIMEWEB_API_KEY` и
-`AI_CHAT_TIMEWEB_AGENT_IDS` данными из панели Timeweb Cloud.
-
 ### Contracts
 
 `@ai-chat/contracts` содержит общие для frontend и backend конфиги AI-моделей, типы и константы.
@@ -101,12 +87,12 @@ npm install
 
 ### 2. Настройка backend
 
-Создайте локальный файл конфигурации adapters:
+Создайте локальный файл конфигурации AI-адаптеров:
 
 - `apps/api/src/adapters/.env.example` → `apps/api/src/adapters/.env`
 
-API development environment уже настроен на порт `5000`. В файле adapters задаются ключи и
-настройки AI-адаптеров.
+Заполните его настройками AI-провайдера, описанными в следующем разделе. API development environment
+уже настроен на порт `5000`.
 
 ### 3. Запуск в локальном окружении
 
@@ -116,6 +102,32 @@ npm run dev
 
 После запуска frontend доступен по адресу `http://localhost:4200`, backend - по адресу
 `http://localhost:5000`.
+
+## Конфигурация
+
+### AI-провайдеры и адаптеры
+
+Backend подключается к AI-провайдерам через адаптеры. Сейчас поддерживается только Timeweb Cloud AI.
+
+Для загрузки конфигурации из файла передайте серверу аргумент `--adapters-env-file=<path>`. Без него
+используются переменные окружения процесса. В файловом режиме переменные процесса не подмешиваются.
+
+#### Timeweb Cloud AI
+
+Укажите в env-файле:
+
+- `AI_CHAT_TIMEWEB_API_KEY` — API-ключ;
+- `AI_CHAT_TIMEWEB_AGENT_IDS` — ID агентов для доступных моделей.
+
+API-ключ и ID агентов доступны в панели Timeweb Cloud. Список ID моделей находится в
+`packages/contracts/src/models/configs`.
+
+### Файлы окружения
+
+- `apps/api/src/environments/environment.ts` - development environment API
+- `apps/api/src/environments/environment.prod.ts` - production environment API
+- `apps/api/src/adapters/.env` - ключи и настройки AI-адаптеров для локального запуска
+- `apps/web/proxy.conf.json` - proxy API + WebSocket на локальный backend
 
 ## Основные команды
 
@@ -144,16 +156,11 @@ npm run format
 npm run format:check
 ```
 
-## Конфигурация окружений
+## Production
 
-- `apps/api/src/environments/environment.ts` - development environment API
-- `apps/api/src/environments/environment.prod.ts` - production environment API
-- `apps/api/src/adapters/.env` - ключи и настройки AI-адаптеров для локального запуска
-- `apps/web/proxy.conf.json` - proxy API + WebSocket на локальный backend
-
-В production adapter-настройки задаются через environment variables платформы либо через
-`--adapters-env-file=/absolute/path/adapters.env`. В File mode значения читаются только из указанного
-файла и не объединяются с environment процесса.
+- `npm run build` - сборка contracts + frontend + backend в `dist/public` и `dist/server.mjs`
+- `node dist/server.mjs` - запуск через настройки адаптеров из environment процесса
+- `node dist/server.mjs --adapters-env-file=/absolute/path/adapters.env` - запуск через внешний файл
 
 ## Структура проекта
 
@@ -177,9 +184,3 @@ apps/
 packages/
   contracts/
 ```
-
-## Production
-
-- `npm run build` - сборка contracts + frontend + backend в `dist/public` и `dist/server.mjs`
-- `node dist/server.mjs` - запуск через adapter-настройки из environment процесса
-- `node dist/server.mjs --adapters-env-file=/absolute/path/adapters.env` - запуск через внешний файл
