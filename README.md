@@ -116,8 +116,12 @@ Backend подключается к AI-провайдерам через ада�
 
 Укажите в env-файле:
 
+- `AI_CHAT_TIMEWEB_USE` — включает адаптер (`true` или `false`, по умолчанию `false`);
 - `AI_CHAT_TIMEWEB_API_KEY` — API-ключ;
 - `AI_CHAT_TIMEWEB_AGENT_IDS` — ID агентов для доступных моделей.
+
+Адаптер регистрируется только при `AI_CHAT_TIMEWEB_USE=true`, и тогда API-ключ и ID агентов
+обязательны. При `false` или отсутствии флага остальные параметры Timeweb не требуются.
 
 API-ключ и ID агентов доступны в панели Timeweb Cloud. Список ID моделей находится в
 `packages/contracts/src/models/configs`.

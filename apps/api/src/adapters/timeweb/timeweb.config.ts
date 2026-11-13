@@ -3,17 +3,29 @@ import type { AdapterEnvironment } from '../adapter-environment.js';
 
 const API_KEY_ENVIRONMENT_KEY = 'AI_CHAT_TIMEWEB_API_KEY';
 const AGENT_IDS_ENVIRONMENT_KEY = 'AI_CHAT_TIMEWEB_AGENT_IDS';
+const USE_ENVIRONMENT_KEY = 'AI_CHAT_TIMEWEB_USE';
 
 export interface TimewebConfig {
   readonly apiKey: string;
   readonly agentIds: ReadonlyMap<ModelId, string>;
 }
 
-export function loadTimewebConfig(source: AdapterEnvironment): TimewebConfig {
+export function loadTimewebConfig(source: AdapterEnvironment): TimewebConfig | undefined {
+  if (!useTimeweb(source)) return undefined;
+
   return Object.freeze({
     apiKey: requiredEnvironmentValue(source, API_KEY_ENVIRONMENT_KEY),
     agentIds: parseAgentIds(requiredEnvironmentValue(source, AGENT_IDS_ENVIRONMENT_KEY)),
   });
+}
+
+function useTimeweb(source: AdapterEnvironment): boolean {
+  const value = source[USE_ENVIRONMENT_KEY]?.trim().toLowerCase();
+
+  if (!value || value === 'false') return false;
+  if (value === 'true') return true;
+
+  throw new Error(`Invalid ${USE_ENVIRONMENT_KEY}: expected true or false`);
 }
 
 function parseAgentIds(serialized: string): ReadonlyMap<ModelId, string> {

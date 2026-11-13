@@ -8,11 +8,20 @@ import { createAvailableModels } from './models/available-models.js';
 async function main(): Promise<void> {
   const adapterEnvironment = await loadAdapterEnvironment();
   const timewebConfig = loadTimewebConfig(adapterEnvironment);
-  const timewebAdapter = new TimewebAdapter(timewebConfig);
-  const availableModels = createAvailableModels([
-    { adapter: timewebAdapter.id, modelIds: Array.from(timewebConfig.agentIds.keys()) },
-  ]);
-  const { httpServer } = createApplication(environment, [timewebAdapter], availableModels);
+  const timeweb = timewebConfig
+    ? {
+        adapter: new TimewebAdapter(timewebConfig),
+        modelIds: Array.from(timewebConfig.agentIds.keys()),
+      }
+    : undefined;
+  const availableModels = createAvailableModels(
+    timeweb ? [{ adapter: timeweb.adapter.id, modelIds: timeweb.modelIds }] : [],
+  );
+  const { httpServer } = createApplication(
+    environment,
+    timeweb ? [timeweb.adapter] : [],
+    availableModels,
+  );
 
   await new Promise<void>((resolve, reject) => {
     httpServer.once('error', reject);
