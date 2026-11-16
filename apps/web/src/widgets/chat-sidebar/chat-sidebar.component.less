@@ -100,7 +100,10 @@
 }
 
 .sidebar-chat__action {
-  display: none;
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
   border: none;
   background: transparent;
   padding: var(--space-0) var(--space-1);
@@ -112,15 +115,21 @@
 
 .sidebar-chat:hover {
   .sidebar-chat__action {
-    display: flex;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 .sidebar-chat__action.dropdown-open {
-  display: flex;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 :host-context(.mobile) .sidebar-chat .sidebar-chat__action {
-  display: flex;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sidebar-chat__model {
