@@ -1,4 +1,4 @@
-import { KNOWN_MODELS, type ModelDefinition, type ModelId } from '@ai-chat/contracts';
+import { getModelDefinition, type ModelDefinition, type ModelId } from '@ai-chat/contracts';
 import type { Adapter } from '../adapters/adapter.constants.js';
 
 export type AvailableModelDefinition = ModelDefinition & {
@@ -27,11 +27,9 @@ export function createAvailableModels(groups: readonly AvailableModelGroup[]): A
 
   const models = new Map<ModelId, AvailableModelDefinition>();
 
-  for (const model of Object.values(KNOWN_MODELS)) {
-    const adapter = adapterByModel.get(model.id);
-    if (!adapter) continue;
-
-    models.set(model.id, Object.freeze({ ...model, adapter }));
+  for (const [modelId, adapter] of adapterByModel) {
+    const model = getModelDefinition(modelId);
+    models.set(modelId, Object.freeze({ ...model, adapter }));
   }
 
   if (models.size === 0) {
