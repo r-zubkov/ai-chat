@@ -24,7 +24,7 @@ describe('code-block-copy helpers', () => {
     setNavigatorClipboard(clipboard);
 
     let resetState: (() => void) | undefined;
-    spyOn(globalThis, 'setTimeout').and.callFake((handler: TimerHandler) => {
+    jest.spyOn(globalThis, 'setTimeout').mockImplementation((handler: TimerHandler) => {
       if (isTimerCallback(handler)) {
         resetState = handler;
       }
@@ -42,7 +42,7 @@ describe('code-block-copy helpers', () => {
     expect(fixture.copyButton.getAttribute('aria-label')).toBe('Скопировано');
     expect(fixture.copyButton.getAttribute('title')).toBe('Скопировано');
     expect(fixture.copyButton.getAttribute('data-copied')).toBe('true');
-    expect(fixture.copyButton.classList.contains('chat-code-block__copy--copied')).toBeTrue();
+    expect(fixture.copyButton.classList.contains('chat-code-block__copy--copied')).toBe(true);
 
     expect(resetState).toBeDefined();
     resetState?.();
@@ -50,14 +50,14 @@ describe('code-block-copy helpers', () => {
     expect(fixture.copyButton.getAttribute('aria-label')).toBe('Копировать');
     expect(fixture.copyButton.getAttribute('title')).toBe('Копировать');
     expect(fixture.copyButton.getAttribute('data-copied')).toBe('false');
-    expect(fixture.copyButton.classList.contains('chat-code-block__copy--copied')).toBeFalse();
+    expect(fixture.copyButton.classList.contains('chat-code-block__copy--copied')).toBe(false);
   });
 
   it('copies code with the Enter key', async () => {
     const fixture = createCodeBlockFixture('console.log(1)');
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
-    spyOn(globalThis, 'setTimeout').and.returnValue(1);
+    jest.spyOn(globalThis, 'setTimeout').mockReturnValue(1);
     const { event, preventDefaultSpy } = createKeyboardEventMock(fixture.copyButton, 'Enter');
 
     handleCodeBlockCopyKeydown(event);
@@ -112,9 +112,11 @@ describe('code-block-copy helpers', () => {
     const clipboard = createClipboardMock();
     setNavigatorClipboard(clipboard);
 
-    const clearTimeoutSpy = spyOn(globalThis, 'clearTimeout');
+    const clearTimeoutSpy = jest
+      .spyOn(globalThis, 'clearTimeout')
+      .mockImplementation(() => undefined);
     let timerId = 0;
-    spyOn(globalThis, 'setTimeout').and.callFake(() => {
+    jest.spyOn(globalThis, 'setTimeout').mockImplementation(() => {
       timerId += 1;
       return timerId;
     });
@@ -138,7 +140,7 @@ function isTimerCallback(handler: TimerHandler): handler is () => void {
 
 interface EventMock<T extends Event> {
   event: T;
-  preventDefaultSpy: jasmine.Spy<() => void>;
+  preventDefaultSpy: jest.MockedFunction<() => void>;
 }
 
 function createCodeBlockFixture(codeText: string): {
@@ -164,7 +166,7 @@ function createCodeBlockFixture(codeText: string): {
 }
 
 function createMouseEventMock(target: EventTarget): EventMock<MouseEvent> {
-  const preventDefaultSpy = jasmine.createSpy<() => void>('preventDefault');
+  const preventDefaultSpy = jest.fn<void, []>();
 
   return {
     event: {
@@ -176,7 +178,7 @@ function createMouseEventMock(target: EventTarget): EventMock<MouseEvent> {
 }
 
 function createKeyboardEventMock(target: EventTarget, key: string): EventMock<KeyboardEvent> {
-  const preventDefaultSpy = jasmine.createSpy<() => void>('preventDefault');
+  const preventDefaultSpy = jest.fn<void, []>();
 
   return {
     event: {
@@ -189,10 +191,12 @@ function createKeyboardEventMock(target: EventTarget, key: string): EventMock<Ke
 }
 
 function createClipboardMock(): Pick<Clipboard, 'writeText'> & {
-  writeText: jasmine.Spy<(text: string) => Promise<void>>;
+  writeText: jest.MockedFunction<Clipboard['writeText']>;
 } {
   return {
-    writeText: jasmine.createSpy('writeText').and.callFake(() => Promise.resolve()),
+    writeText: jest
+      .fn<ReturnType<Clipboard['writeText']>, Parameters<Clipboard['writeText']>>()
+      .mockResolvedValue(undefined),
   };
 }
 

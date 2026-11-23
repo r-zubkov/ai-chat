@@ -35,8 +35,8 @@ describe('chat-api.helpers', () => {
       role: ChatMessageRole.USER,
       content: 'Текущий вопрос',
     });
-    expect(result.some((item) => item.role === 'system')).toBeFalse();
-    expect(result.some((item) => item.content === `Сообщение ${HISTORY_LIMIT}`)).toBeFalse();
+    expect(result.some((item) => item.role === 'system')).toBe(false);
+    expect(result.some((item) => item.content === `Сообщение ${HISTORY_LIMIT}`)).toBe(false);
   });
 });
 

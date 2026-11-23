@@ -5,7 +5,7 @@ import { createChatEntity, createMessageEntity, generateSequelId } from './chat.
 
 describe('chat.helpers', () => {
   it('generates sequelId from time and a local counter', () => {
-    spyOn(Date, 'now').and.returnValue(123);
+    jest.spyOn(Date, 'now').mockReturnValue(123);
 
     const sequelId = generateSequelId(7);
 
@@ -13,14 +13,14 @@ describe('chat.helpers', () => {
   });
 
   it('creates a chat entity with default fields', () => {
-    spyOn(Date, 'now').and.returnValue(1_000);
+    jest.spyOn(Date, 'now').mockReturnValue(1_000);
     const longName = `  ${'слово '.repeat(30)}  `;
 
     const chat = createChatEntity(longName, GPT_MODELS.GPT_5_1.id);
 
     expect(chat.id).toBeTruthy();
     expect(chat.title.length).toBeLessThanOrEqual(120);
-    expect(chat.title.endsWith('…')).toBeFalse();
+    expect(chat.title.endsWith('…')).toBe(false);
     expect(chat.state).toBe(ChatState.IDLE);
     expect(chat.projectId).toBeNull();
     expect(chat.currentRequestId).toBeNull();
@@ -29,7 +29,7 @@ describe('chat.helpers', () => {
   });
 
   it('creates a message entity with an id and timestamp', () => {
-    spyOn(Date, 'now').and.returnValue(2_000);
+    jest.spyOn(Date, 'now').mockReturnValue(2_000);
 
     const message = createMessageEntity({
       chatId: toChatId('chat-1'),

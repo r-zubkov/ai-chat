@@ -1,0 +1,20 @@
+module.exports = {
+  preset: 'jest-preset-angular',
+  setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
+  testEnvironment: 'jsdom',
+  restoreMocks: true,
+  moduleNameMapper: {
+    '^@app$': '<rootDir>/src/app/index.ts',
+    '^@app/(.*)$': '<rootDir>/src/app/$1',
+    '^@pages$': '<rootDir>/src/pages/index.ts',
+    '^@pages/(.*)$': '<rootDir>/src/pages/$1',
+    '^@widgets$': '<rootDir>/src/widgets/index.ts',
+    '^@widgets/(.*)$': '<rootDir>/src/widgets/$1',
+    '^@features$': '<rootDir>/src/features/index.ts',
+    '^@features/(.*)$': '<rootDir>/src/features/$1',
+    '^@entities$': '<rootDir>/src/entities/index.ts',
+    '^@entities/(.*)$': '<rootDir>/src/entities/$1',
+    '^@shared$': '<rootDir>/src/shared/index.ts',
+    '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+  },
+};

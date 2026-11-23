@@ -9,7 +9,7 @@
     "build": "ng build -c production",
     "lint": "eslint .",
     "typecheck": "ngc -p tsconfig.app.json && tsc -p tsconfig.spec.json --noEmit",
-    "test": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
+    "test": "jest --runInBand"
   },
   "lint-staged": {
     "*.{ts,html}": [
@@ -45,7 +45,7 @@
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.5",
     "@eslint/js": "^9.39.3",
-    "@types/jasmine": "~5.1.0",
+    "@types/jest": "^30.0.0",
     "@types/markdown-it": "^14.1.2",
     "angular-eslint": "^22.6.0",
     "eslint": "^9.39.3",
@@ -54,12 +54,9 @@
     "eslint-plugin-boundaries": "^4.2.2",
     "eslint-plugin-import": "^2.32.0",
     "istanbul-lib-instrument": "^6.0.3",
-    "jasmine-core": "~5.9.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
+    "jest-preset-angular": "^17.0.3",
     "less": "^4.2.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.3",

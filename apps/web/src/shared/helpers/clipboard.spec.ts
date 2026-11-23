@@ -24,12 +24,12 @@ describe('clipboard helpers', () => {
 
   it('copies plain text to the clipboard', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(() => Promise.resolve());
+    clipboard.writeText.mockResolvedValue(undefined);
     setNavigatorClipboard(clipboard);
 
     const copied = await copyPlainTextToClipboard('Текст');
 
-    expect(copied).toBeTrue();
+    expect(copied).toBe(true);
     expect(clipboard.writeText).toHaveBeenCalledWith('Текст');
   });
 
@@ -38,37 +38,37 @@ describe('clipboard helpers', () => {
 
     const copied = await copyPlainTextToClipboard('Текст');
 
-    expect(copied).toBeFalse();
+    expect(copied).toBe(false);
   });
 
   it('returns false for plain text after a write error', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(() => Promise.reject(new Error('Ошибка записи')));
+    clipboard.writeText.mockRejectedValue(new Error('Ошибка записи'));
     setNavigatorClipboard(clipboard);
-    spyOn(console, 'error');
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
     const copied = await copyPlainTextToClipboard('Текст');
 
-    expect(copied).toBeFalse();
+    expect(copied).toBe(false);
     expect(console.error).toHaveBeenCalled();
   });
 
   it('copies HTML through ClipboardItem when rich copy is available', async () => {
     const clipboard = createClipboardMock();
-    clipboard.write.and.callFake(() => Promise.resolve());
+    clipboard.write.mockResolvedValue(undefined);
     setNavigatorClipboard(clipboard);
     setClipboardItemMock();
 
     const copied = await copyHtmlToClipboard('<b>Текст</b>', 'Текст');
 
-    expect(copied).toBeTrue();
+    expect(copied).toBe(true);
     expect(clipboard.write).toHaveBeenCalled();
     expect(clipboard.writeText).not.toHaveBeenCalled();
   });
 
   it('falls back to plain text when ClipboardItem is unavailable', async () => {
     const clipboard = createClipboardMock();
-    clipboard.writeText.and.callFake(() => Promise.resolve());
+    clipboard.writeText.mockResolvedValue(undefined);
     setNavigatorClipboard(clipboard);
     Object.defineProperty(globalThis, 'ClipboardItem', {
       value: undefined,
@@ -78,22 +78,22 @@ describe('clipboard helpers', () => {
 
     const copied = await copyHtmlToClipboard('<b>Текст</b>', 'Текст');
 
-    expect(copied).toBeTrue();
+    expect(copied).toBe(true);
     expect(clipboard.write).not.toHaveBeenCalled();
     expect(clipboard.writeText).toHaveBeenCalledWith('Текст');
   });
 
   it('falls back to plain text after a rich-copy write error', async () => {
     const clipboard = createClipboardMock();
-    clipboard.write.and.callFake(() => Promise.reject(new Error('Ошибка rich-copy')));
-    clipboard.writeText.and.callFake(() => Promise.resolve());
+    clipboard.write.mockRejectedValue(new Error('Ошибка rich-copy'));
+    clipboard.writeText.mockResolvedValue(undefined);
     setNavigatorClipboard(clipboard);
     setClipboardItemMock();
-    spyOn(console, 'error');
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
     const copied = await copyHtmlToClipboard('<b>Текст</b>', 'Текст');
 
-    expect(copied).toBeTrue();
+    expect(copied).toBe(true);
     expect(clipboard.write).toHaveBeenCalled();
     expect(clipboard.writeText).toHaveBeenCalledWith('Текст');
     expect(console.error).toHaveBeenCalled();
@@ -104,15 +104,15 @@ describe('clipboard helpers', () => {
 
     const copied = await copyHtmlToClipboard('<b>Текст</b>', 'Текст');
 
-    expect(copied).toBeFalse();
+    expect(copied).toBe(false);
   });
 });
 
-function createClipboardMock(): jasmine.SpyObj<Pick<Clipboard, 'write' | 'writeText'>> {
-  return jasmine.createSpyObj<Pick<Clipboard, 'write' | 'writeText'>>('clipboard', [
-    'write',
-    'writeText',
-  ]);
+function createClipboardMock(): jest.Mocked<Pick<Clipboard, 'write' | 'writeText'>> {
+  return {
+    write: jest.fn<ReturnType<Clipboard['write']>, Parameters<Clipboard['write']>>(),
+    writeText: jest.fn<ReturnType<Clipboard['writeText']>, Parameters<Clipboard['writeText']>>(),
+  };
 }
 
 function setNavigatorClipboard(
