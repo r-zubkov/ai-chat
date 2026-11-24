@@ -1,20 +1,23 @@
 ﻿<div class="sidebar-root flex flex-col h-full">
-  <div class="sidebar-list sidebar-header">
-    <a class="sidebar-list__btn sidebar-action-btn sidebar-new-btn" [routerLink]="chatRoutes.new">
+  <div class="sidebar-list sidebar-header flex flex-col">
+    <a
+      class="sidebar-list__btn sidebar-action-btn sidebar-new-btn gap-2 px-3"
+      [routerLink]="chatRoutes.new"
+    >
       <tui-icon icon="@tui.message-circle-plus" [style.font-size.rem]="1" />
       <span>Новый чат</span>
     </a>
   </div>
 
   <tui-scrollbar class="flex-1">
-    <div class="sidebar-list">
+    <div class="sidebar-list flex flex-col">
       @for (chat of chatStore.chats(); track chat.id) {
         <div
-          class="sidebar-chat sidebar-list__btn sidebar-list__btn--inner-padding flex items-center items-stretch gap-3"
+          class="sidebar-chat sidebar-list__btn relative flex items-stretch gap-0 p-0"
           [class.sidebar-list__btn--active]="chat.id === chatStore.activeChatId()"
         >
           <a
-            class="sidebar-chat__link flex items-center gap-3 min-width-0 flex-auto"
+            class="sidebar-chat__link flex items-center gap-3 min-width-0 flex-auto px-3 py-2"
             [routerLink]="chatRoutes.byId(chat.id)"
           >
             @if (chat.state === ChatState.THINKING) {
@@ -22,7 +25,7 @@
             }
 
             <div class="min-width-0 flex-1">
-              <div class="sidebar-chat__title truncate">
+              <div class="sidebar-chat__title mb-1 truncate">
                 {{ chat.title }}
               </div>
               <div class="sidebar-chat__model opacity-60 truncate">
@@ -32,7 +35,7 @@
           </a>
 
           <button
-            class="sidebar-chat__action items-center cursor-pointer"
+            class="sidebar-chat__action flex flex-shrink-0 items-center cursor-pointer px-3 py-2"
             type="button"
             [class.dropdown-open]="isItemOptionsDropdownOpen(chat.id)"
             tuiActiveZone
@@ -71,7 +74,7 @@
       @if (chatStore.hasMoreChats()) {
         <button
           type="button"
-          class="sidebar-list__btn sidebar-action-btn sidebar-load-more-btn"
+          class="sidebar-list__btn sidebar-action-btn sidebar-load-more-btn gap-2 px-3"
           [disabled]="isLoadingMoreChats()"
           (click)="handleLoadMoreChats()"
         >
@@ -84,11 +87,11 @@
     </div>
   </tui-scrollbar>
 
-  <div class="sidebar-list sidebar-footer">
+  <div class="sidebar-list sidebar-footer flex flex-col">
     @if (chatStore.chatsCount()) {
       <button
         type="button"
-        class="sidebar-list__btn sidebar-action-btn"
+        class="sidebar-list__btn sidebar-action-btn gap-2 px-3"
         (click)="handleOpenClearConfirmationModal()"
       >
         <tui-icon icon="@tui.brush-cleaning" [style.font-size.rem]="1" />

@@ -1,6 +1,4 @@
 .sidebar-list {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-4);
 }
@@ -17,7 +15,6 @@
 
 .sidebar-list__btn {
   width: 100%;
-  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   text-align: left;
   text-decoration: none;
@@ -33,14 +30,6 @@
   }
 }
 
-.sidebar-list__btn--inner-padding {
-  padding: 0;
-}
-
-.sidebar-chat.sidebar-list__btn--inner-padding {
-  gap: 0;
-}
-
 .sidebar-list__btn,
 .sidebar-list__btn * {
   -webkit-text-fill-color: white !important;
@@ -51,8 +40,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--space-2);
-  padding: 10px var(--space-3);
+  padding-block: 10px;
   transition: background-color var(--duration-slow) var(--ease-standard);
   background: var(--color-bg-dark-subtle);
   line-height: 1;
@@ -83,50 +71,26 @@
   text-decoration: none;
 }
 
-.sidebar-chat.sidebar-list__btn--inner-padding .sidebar-chat__link {
-  padding: var(--space-2) var(--space-3);
-}
-
-.sidebar-chat.sidebar-list__btn--inner-padding:hover .sidebar-chat__link {
-  padding-right: 0;
-}
-
-.sidebar-chat__title {
-  margin-bottom: var(--space-1);
-
-  &::first-letter {
-    text-transform: uppercase;
-  }
+.sidebar-chat__title::first-letter {
+  text-transform: uppercase;
 }
 
 .sidebar-chat__action {
-  display: flex;
+  // Preserve the anchor's bounds during the dropdown's closing animation.
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
   border: none;
   background: transparent;
-  padding: var(--space-0) var(--space-1);
 }
 
-.sidebar-chat.sidebar-list__btn--inner-padding .sidebar-chat__action {
-  padding: var(--space-2) var(--space-3);
-}
-
-.sidebar-chat:hover {
-  .sidebar-chat__action {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-.sidebar-chat__action.dropdown-open {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-}
-
+.sidebar-chat:hover .sidebar-chat__action,
+.sidebar-chat__action.dropdown-open,
 :host-context(.mobile) .sidebar-chat .sidebar-chat__action {
+  position: static;
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
