@@ -13,6 +13,7 @@ import { TuiTextarea } from '@taiga-ui/kit';
 })
 export class ChatInputComponent {
   readonly thinking = input(false);
+  readonly allowSend = input(true);
 
   @Output() sendMessage = new EventEmitter<string>();
   @Output() cancelRequest = new EventEmitter<void>();
@@ -24,7 +25,9 @@ export class ChatInputComponent {
   });
 
   protected get isSendAllowed(): boolean {
-    return !this.thinking() && this.form.controls.message.value.trim().length > 0;
+    return (
+      this.allowSend() && !this.thinking() && this.form.controls.message.value.trim().length > 0
+    );
   }
 
   protected send(): void {

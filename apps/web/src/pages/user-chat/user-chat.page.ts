@@ -3,13 +3,16 @@
   Component,
   DestroyRef,
   ElementRef,
+  Injector,
   Input,
   ViewChild,
+  afterNextRender,
   inject,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TuiButton, TuiScrollbar } from '@taiga-ui/core';
-import { ChatState, ChatStore, toChatId } from '@entities/chat';
+import { ChatId, ChatState, ChatStore, toChatId } from '@entities/chat';
 import { ChatMessage, ChatMessageRole, MessageStore } from '@entities/message';
 import { ManageChatService } from '@features/manage-chat';
 import { NavigateChatService } from '@features/navigate-chat';
@@ -24,6 +27,7 @@ import {
 import { CopyTextButtonComponent, MarkdownPipe, ModelLabelPipe } from '@shared';
 import { ShellUiService } from '@shared/ui';
 import { ChatInputComponent } from '@widgets/chat-input';
+import { ChatHistoryState } from './user-chat.model';
 
 @Component({
   selector: 'app-user-chat-page',
@@ -41,6 +45,7 @@ import { ChatInputComponent } from '@widgets/chat-input';
 })
 export class UserChatPage {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   readonly chatStore = inject(ChatStore);
   readonly messageStore = inject(MessageStore);
@@ -51,18 +56,24 @@ export class UserChatPage {
   private readonly navigateChat = inject(NavigateChatService);
   private readonly shellUi = inject(ShellUiService);
 
+  protected readonly historyState = signal<ChatHistoryState>(ChatHistoryState.LOADING);
+  private historyLoadId = 0;
+
   @Input() set id(chatId: string) {
     const activeId = toChatId(chatId);
+    const loadId = ++this.historyLoadId;
+    this.historyState.set(ChatHistoryState.LOADING);
     this.chatStore.setActive(activeId);
     this.selectModel.syncCurrentModelForChat(activeId);
     this.shellUi.closeSidebarOnMobile();
-    void this.loadMessages(activeId, 'instant');
+    void this.loadMessages(activeId, loadId);
   }
 
   @ViewChild(TuiScrollbar, { read: ElementRef })
   private readonly scrollBar?: ElementRef<HTMLElement>;
 
   protected readonly ChatState = ChatState;
+  protected readonly ChatHistoryState = ChatHistoryState;
   protected readonly ChatMessageRole = ChatMessageRole;
 
   protected onSendMessage(text: string): void {
@@ -86,8 +97,12 @@ export class UserChatPage {
   }
 
   protected handleRequestEvent(event: SendMessageEvent): void {
-    if (event.type === SendMessageEventType.SENT) {
-      setTimeout(() => this.scrollToBottom('smooth'), 50);
+    if (
+      event.type === SendMessageEventType.SENT &&
+      event.chatId === this.chatStore.activeChatId() &&
+      this.historyState() === ChatHistoryState.READY
+    ) {
+      this.scrollToBottomAfterRender(event.chatId, 'smooth');
     }
   }
 
@@ -109,37 +124,38 @@ export class UserChatPage {
       });
   }
 
-  private async loadMessages(
-    chatId = this.chatStore.activeChatId(),
-    scrollEffect: 'instant' | 'smooth' | null = null,
-  ): Promise<void> {
-    if (!chatId) {
+  private async loadMessages(chatId: ChatId, loadId: number): Promise<void> {
+    try {
+      const hasChat = await this.chatStore.ensureChatLoaded(chatId);
+      if (!this.isCurrentHistoryLoad(chatId, loadId)) return;
+
+      if (!hasChat) {
+        await this.navigateChat.toNewChat();
+        return;
+      }
+
+      this.selectModel.syncCurrentModelForChat(chatId);
+      await this.messageStore.loadByChatId(chatId);
+      if (!this.isCurrentHistoryLoad(chatId, loadId)) return;
+
+      this.scrollToBottomAfterRender(chatId, 'instant', () => {
+        this.historyState.set(ChatHistoryState.READY);
+      });
+    } catch (error) {
+      if (!this.isCurrentHistoryLoad(chatId, loadId)) return;
+
+      console.error('Error loading chat history:', error);
       this.messageStore.clearMessages();
-      return;
+      this.historyState.set(ChatHistoryState.ERROR);
     }
+  }
 
-    const hasChat = await this.chatStore.ensureChatLoaded(chatId);
-
-    if (chatId !== this.chatStore.activeChatId()) {
-      return;
-    }
-
-    if (!hasChat) {
-      await this.navigateChat.toNewChat();
-      return;
-    }
-
-    this.selectModel.syncCurrentModelForChat(chatId);
-
-    await this.messageStore.loadByChatId(chatId);
-
-    if (chatId !== this.chatStore.activeChatId()) {
-      return;
-    }
-
-    if (scrollEffect) {
-      setTimeout(() => this.scrollToBottom(scrollEffect), 50);
-    }
+  private isCurrentHistoryLoad(chatId: ChatId, loadId: number): boolean {
+    return (
+      !this.destroyRef.destroyed &&
+      loadId === this.historyLoadId &&
+      chatId === this.chatStore.activeChatId()
+    );
   }
 
   private scrollToMessage(messageId: string, behavior: ScrollBehavior = 'smooth'): void {
@@ -156,11 +172,27 @@ export class UserChatPage {
     this.scrollTo(container, topOffset, behavior);
   }
 
-  private scrollToBottom(behavior: ScrollBehavior = 'auto'): void {
-    const container = this.scrollBar?.nativeElement;
-    if (!container) return;
+  private scrollToBottomAfterRender(
+    chatId: ChatId,
+    behavior: ScrollBehavior,
+    onScrolled?: () => void,
+  ): void {
+    const loadId = this.historyLoadId;
+    afterNextRender(
+      {
+        earlyRead: () => {
+          const container = this.scrollBar?.nativeElement;
+          return container && { container, top: container.scrollHeight };
+        },
+        write: (position) => {
+          if (!this.isCurrentHistoryLoad(chatId, loadId)) return;
 
-    this.scrollTo(container, container.scrollHeight, behavior);
+          if (position) this.scrollTo(position.container, position.top, behavior);
+          onScrolled?.();
+        },
+      },
+      { injector: this.injector },
+    );
   }
 
   private scrollTo(container: HTMLElement, top: number, behavior: ScrollBehavior = 'auto'): void {

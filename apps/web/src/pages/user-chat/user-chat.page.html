@@ -1,5 +1,7 @@
-﻿<div class="chat-list">
-  <tui-scrollbar>
+﻿<div class="chat-list" [attr.aria-busy]="historyState() === ChatHistoryState.LOADING">
+  <tui-scrollbar
+    [class.chat-list__scrollbar--loading]="historyState() === ChatHistoryState.LOADING"
+  >
     <div class="flex flex-col items-center">
       <div class="chat-messages flex flex-col flex-1 pt-6">
         @for (msg of messageStore.messages(); let last = $last; track msg.id) {
@@ -60,7 +62,9 @@
           </div>
         }
 
-        @if (chatStore.activeChat()?.state === ChatState.ERROR) {
+        @if (historyState() === ChatHistoryState.ERROR) {
+          <div role="alert">Не удалось загрузить историю чата</div>
+        } @else if (chatStore.activeChat()?.state === ChatState.ERROR) {
           <div class="chat-error flex flex-col items-start">
             <div class="mb-4">Произошла ошибка</div>
             <button
@@ -82,6 +86,7 @@
   <div class="chat-input absolute w-full">
     <app-chat-input
       [thinking]="chatStore.activeChat()?.state === ChatState.THINKING"
+      [allowSend]="historyState() === ChatHistoryState.READY"
       (sendMessage)="onSendMessage($event)"
       (cancelRequest)="onCancelRequest()"
     ></app-chat-input>
