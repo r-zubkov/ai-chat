@@ -1,8 +1,17 @@
-﻿import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from '@angular/core';
+﻿import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output,
+  inject,
+  input,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { isMobileDevice } from '@shared/helpers';
 import { TuiButton, TuiInput } from '@taiga-ui/core';
 import { TuiTextarea } from '@taiga-ui/kit';
+import { ChatDraftService } from './chat-draft.service';
 
 @Component({
   selector: 'app-chat-input',
@@ -12,6 +21,8 @@ import { TuiTextarea } from '@taiga-ui/kit';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatInputComponent {
+  private readonly chatDraft = inject(ChatDraftService);
+
   readonly thinking = input(false);
   readonly allowSend = input(true);
 
@@ -19,10 +30,14 @@ export class ChatInputComponent {
   @Output() cancelRequest = new EventEmitter<void>();
 
   protected readonly form = new FormGroup({
-    message: new FormControl('', {
+    message: new FormControl(this.chatDraft.getDraft(), {
       nonNullable: true,
     }),
   });
+
+  constructor() {
+    this.watchDraftChanges();
+  }
 
   protected get isSendAllowed(): boolean {
     return (
@@ -50,5 +65,11 @@ export class ChatInputComponent {
 
     event.preventDefault();
     this.send();
+  }
+
+  private watchDraftChanges(): void {
+    this.form.controls.message.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((text) => this.chatDraft.saveDraft(text));
   }
 }
