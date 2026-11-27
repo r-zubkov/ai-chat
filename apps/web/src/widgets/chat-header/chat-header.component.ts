@@ -2,9 +2,9 @@
 import { RouterLink } from '@angular/router';
 import { TuiDataList, TuiDropdown, TuiIcon, TuiLink } from '@taiga-ui/core';
 import { TuiChevron } from '@taiga-ui/kit';
+import type { ModelId } from '@ai-chat/contracts';
 import { ChatStore } from '@entities/chat';
 import { SettingsStore } from '@entities/settings';
-import type { ModelType } from '@entities/settings';
 import { SelectModelService } from '@features/select-model';
 import { CHAT_ROUTES } from '@shared/routes';
 import { ShellUiService } from '@shared/ui';
@@ -25,18 +25,18 @@ export class ChatHeaderComponent {
   readonly chatStore = inject(ChatStore);
 
   protected readonly selectedModel = computed(() => {
-    const currentModel = this.settingsStore.currentModel();
-    return this.selectModel.models().find((model) => model.id === currentModel)?.label ?? null;
+    const selectedModelId = this.settingsStore.selectedModelId();
+    return this.selectModel.models().find((model) => model.id === selectedModelId)?.label ?? null;
   });
   protected readonly chatRoutes = CHAT_ROUTES;
 
-  protected onClick(model: ModelType): void {
+  protected onClick(model: ModelId): void {
     void this.selectModel.selectModel(model);
     this.modelSelectionOpen = false;
   }
 
-  protected itemIsActive(model: ModelType): boolean {
-    return model === this.settingsStore.currentModel();
+  protected itemIsActive(model: ModelId): boolean {
+    return model === this.settingsStore.selectedModelId();
   }
 
   protected toggleMenu(): void {

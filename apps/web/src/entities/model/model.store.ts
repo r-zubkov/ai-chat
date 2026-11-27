@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { getModelDefinition } from '@ai-chat/contracts';
-import type { ModelOption, ModelType } from '@shared/config';
+import { getModelDefinition, type ModelId } from '@ai-chat/contracts';
+import type { ModelOption } from '@shared/config';
 import { ModelRepository } from './model.repository';
 
 interface ModelStoreState {
@@ -31,10 +31,10 @@ export const ModelStore = signalStore(
       modelRepository.cacheAvailableModelIds(modelIds);
       return models;
     },
-    isAvailable(model: string): model is ModelType {
+    isAvailable(model: string): model is ModelId {
       return store.models().some((item) => item.id === model);
     },
-    getDefaultModel(): ModelType {
+    getDefaultModel(): ModelId {
       const model = store.models()[0];
       if (!model) throw new Error('No available models are loaded');
       return model.id;

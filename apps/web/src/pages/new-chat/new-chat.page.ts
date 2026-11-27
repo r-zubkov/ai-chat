@@ -4,7 +4,7 @@ import { ChatState, ChatStore } from '@entities/chat';
 import { MessageStore } from '@entities/message';
 import { SettingsStore } from '@entities/settings';
 import { NavigateChatService } from '@features/navigate-chat';
-import { SendMessageEventType, SendMessageService } from '@features/send-message';
+import { ChatRequestEventType, SendMessageService } from '@features/send-message';
 import { ShellUiService } from '@shared/ui';
 import { ChatInputComponent } from '@widgets/chat-input';
 
@@ -29,8 +29,8 @@ export class NewChatPage implements OnInit {
   ngOnInit(): void {
     this.chatStore.setActive(null);
     this.messageStore.clearState();
-    const globalModel = this.settings.globalCurrentModel();
-    if (globalModel) this.settings.setCurrentModel(globalModel);
+    const preferredModelId = this.settings.preferredModelId();
+    if (preferredModelId) this.settings.setSelectedModelId(preferredModelId);
     this.shellUi.closeSidebarOnMobile();
   }
 
@@ -40,7 +40,7 @@ export class NewChatPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (event) => {
-          if (event.type === SendMessageEventType.SENT) {
+          if (event.type === ChatRequestEventType.STARTED) {
             void this.navigateChat.toChat(event.chatId);
           }
         },

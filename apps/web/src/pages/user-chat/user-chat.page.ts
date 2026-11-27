@@ -16,7 +16,7 @@ import { ChatId, ChatState, ChatStore, toChatId } from '@entities/chat';
 import { ChatMessage, ChatMessageRole, MessageStore } from '@entities/message';
 import { ManageChatService } from '@features/manage-chat';
 import { NavigateChatService } from '@features/navigate-chat';
-import { SendMessageEvent, SendMessageEventType, SendMessageService } from '@features/send-message';
+import { ChatRequestEvent, ChatRequestEventType, SendMessageService } from '@features/send-message';
 import { SelectModelService } from '@features/select-model';
 import {
   getCssValue,
@@ -64,7 +64,7 @@ export class UserChatPage {
     const loadId = ++this.historyLoadId;
     this.historyState.set(ChatHistoryState.LOADING);
     this.chatStore.setActive(activeId);
-    this.selectModel.syncCurrentModelForChat(activeId);
+    this.selectModel.syncSelectedModelForChat(activeId);
     this.shellUi.closeSidebarOnMobile();
     void this.loadMessages(activeId, loadId);
   }
@@ -87,7 +87,7 @@ export class UserChatPage {
     this.sendMessageService.stopRequest(chat);
   }
 
-  protected retryLasRequest(): void {
+  protected resendLastUserMessage(): void {
     const messages = this.messageStore.messages();
     const lastUserMsg = messages.filter((msg) => msg.role === ChatMessageRole.USER).at(-1);
 
@@ -96,9 +96,9 @@ export class UserChatPage {
     this.send(lastUserMsg.content, messages);
   }
 
-  protected handleRequestEvent(event: SendMessageEvent): void {
+  protected handleRequestEvent(event: ChatRequestEvent): void {
     if (
-      event.type === SendMessageEventType.SENT &&
+      event.type === ChatRequestEventType.STARTED &&
       event.chatId === this.chatStore.activeChatId() &&
       this.historyState() === ChatHistoryState.READY
     ) {
@@ -134,7 +134,7 @@ export class UserChatPage {
         return;
       }
 
-      this.selectModel.syncCurrentModelForChat(chatId);
+      this.selectModel.syncSelectedModelForChat(chatId);
       await this.messageStore.loadByChatId(chatId);
       if (!this.isCurrentHistoryLoad(chatId, loadId)) return;
 

@@ -1,19 +1,20 @@
 ﻿import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import type { ModelOption, ModelType } from '@shared/config';
+import type { ModelId } from '@ai-chat/contracts';
+import type { ModelOption } from '@shared/config';
 import { SettingsRepository } from './settings.repository';
 import { SettingKey } from './settings.model';
 
 type SettingsStoreState = {
-  currentModel: ModelType | null;
-  globalCurrentModel: ModelType | null;
+  selectedModelId: ModelId | null;
+  preferredModelId: ModelId | null;
 };
 
 export const SettingsStore = signalStore(
   { providedIn: 'root' },
   withState<SettingsStoreState>({
-    currentModel: null,
-    globalCurrentModel: null,
+    selectedModelId: null,
+    preferredModelId: null,
   }),
   withMethods((store, settingsRepository = inject(SettingsRepository)) => ({
     async loadSettings(availableModels: readonly ModelOption[]): Promise<void> {
@@ -24,38 +25,40 @@ export const SettingsStore = signalStore(
       const model = availableModels.some((item) => item.id === loaded) ? loaded : fallback;
 
       patchState(store, {
-        currentModel: model,
-        globalCurrentModel: model,
+        selectedModelId: model,
+        preferredModelId: model,
       });
     },
     async reconcileAvailableModels(availableModels: readonly ModelOption[]): Promise<void> {
       const fallback = availableModels[0]?.id;
       if (!fallback) throw new Error('No available models are loaded');
 
-      const isAvailable = (model: ModelType | null): model is ModelType =>
+      const isAvailable = (model: ModelId | null): model is ModelId =>
         model !== null && availableModels.some((item) => item.id === model);
-      const currentModel = store.currentModel();
-      const globalCurrentModel = store.globalCurrentModel();
-      const nextGlobalModel = isAvailable(globalCurrentModel) ? globalCurrentModel : fallback;
-      const nextCurrentModel = isAvailable(currentModel) ? currentModel : nextGlobalModel;
+      const selectedModelId = store.selectedModelId();
+      const preferredModelId = store.preferredModelId();
+      const nextPreferredModelId = isAvailable(preferredModelId) ? preferredModelId : fallback;
+      const nextSelectedModelId = isAvailable(selectedModelId)
+        ? selectedModelId
+        : nextPreferredModelId;
 
       patchState(store, {
-        currentModel: nextCurrentModel,
-        globalCurrentModel: nextGlobalModel,
+        selectedModelId: nextSelectedModelId,
+        preferredModelId: nextPreferredModelId,
       });
 
-      if (globalCurrentModel !== nextGlobalModel) {
-        await settingsRepository.setSetting(SettingKey.CURRENT_MODEL, nextGlobalModel);
+      if (preferredModelId !== nextPreferredModelId) {
+        await settingsRepository.setSetting(SettingKey.CURRENT_MODEL, nextPreferredModelId);
       }
     },
-    setCurrentModel(model: ModelType): void {
-      patchState(store, { currentModel: model });
+    setSelectedModelId(model: ModelId): void {
+      patchState(store, { selectedModelId: model });
     },
-    setGlobalCurrentModel(model: ModelType): void {
-      patchState(store, { globalCurrentModel: model });
+    setPreferredModelId(model: ModelId): void {
+      patchState(store, { preferredModelId: model });
     },
-    async persistGlobalModel(model: ModelType): Promise<void> {
-      patchState(store, { globalCurrentModel: model });
+    async persistPreferredModelId(model: ModelId): Promise<void> {
+      patchState(store, { preferredModelId: model });
       await settingsRepository.setSetting(SettingKey.CURRENT_MODEL, model);
     },
   })),

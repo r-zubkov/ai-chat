@@ -1,2 +1,2 @@
-﻿export { SendMessageService, SendMessageEventType } from './send-message.service';
-export type { SendMessageEvent } from './send-message.service';
+﻿export { SendMessageService, ChatRequestEventType } from './send-message.service';
+export type { ChatRequestEvent } from './send-message.service';

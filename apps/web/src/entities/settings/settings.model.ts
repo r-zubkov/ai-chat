@@ -1,15 +1,15 @@
-import type { ModelOption, ModelType } from '@shared/config';
+import type { ModelId } from '@ai-chat/contracts';
 
-export type { ModelOption, ModelType };
+export type { ModelOption } from '@shared/config';
 
 export enum SettingKey {
   CURRENT_MODEL = 'current-model',
 }
 
-export type SettingValue = ModelType;
+export type SettingValue = ModelId;
 
 export interface SettingsMap {
-  [SettingKey.CURRENT_MODEL]: ModelType;
+  [SettingKey.CURRENT_MODEL]: ModelId;
 }
 
 export type Setting = {

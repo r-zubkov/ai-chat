@@ -26,19 +26,19 @@ import { STREAM_PERSIST_INTERVAL } from '@shared/config';
 import { buildApiMessages } from './chat-api.helpers';
 import { createChatEntity, createMessageEntity, generateSequelId } from './chat.helpers';
 
-export enum SendMessageEventType {
-  SENT = 'sent',
+export enum ChatRequestEventType {
+  STARTED = 'started',
   FINISHED = 'finished',
 }
 
-export type SendMessageEvent =
+export type ChatRequestEvent =
   | {
-      type: SendMessageEventType.SENT;
+      type: ChatRequestEventType.STARTED;
       chatId: ChatId;
       userMessage: ChatMessage;
     }
   | {
-      type: SendMessageEventType.FINISHED;
+      type: ChatRequestEventType.FINISHED;
       chatId: ChatId;
       assistantMessage: ChatMessage;
     };
@@ -52,10 +52,10 @@ export class SendMessageService {
   private readonly socket = inject(SocketService);
   private readonly settings = inject(SettingsStore);
 
-  sendMessage(text: string, messageHistory: ChatMessage[]): Observable<SendMessageEvent> {
-    const events$ = new Subject<SendMessageEvent>();
+  sendMessage(text: string, messageHistory: ChatMessage[]): Observable<ChatRequestEvent> {
+    const events$ = new Subject<ChatRequestEvent>();
     const trimmed = text.trim();
-    const model = this.settings.currentModel();
+    const model = this.settings.selectedModelId();
 
     if (!trimmed || !model) {
       events$.complete();
@@ -120,7 +120,7 @@ export class SendMessageService {
         });
 
         events$.next({
-          type: SendMessageEventType.SENT,
+          type: ChatRequestEventType.STARTED,
           chatId: activeChatId,
           userMessage,
         });
@@ -230,7 +230,7 @@ export class SendMessageService {
                 };
 
                 events$.next({
-                  type: SendMessageEventType.FINISHED,
+                  type: ChatRequestEventType.FINISHED,
                   chatId: activeChatId,
                   assistantMessage: finalAssistantMessage,
                 });
