@@ -4,7 +4,7 @@
       class="burger-btn flex justify-center items-center cursor-pointer relative"
       aria-label="Меню"
       [class.open]="shellUi.sidebarOpen()"
-      (click)="toggleMenu()"
+      (click)="toggleSidebar()"
     >
       <span></span>
     </button>
@@ -26,7 +26,7 @@
       type="button"
       class="header__model-selection"
       [class.open]="modelSelectionOpen"
-      [textContent]="selectedModel()"
+      [textContent]="selectedModelLabel()"
       [tuiDropdown]="dropdown"
       [(tuiDropdownOpen)]="modelSelectionOpen"
     ></button>
@@ -46,9 +46,9 @@
 <ng-template #dropdown>
   <tui-data-list>
     @for (model of selectModel.models(); track model.id) {
-      <button tuiOption type="button" (click)="onClick(model.id)">
+      <button tuiOption type="button" (click)="onModelSelect(model.id)">
         {{ model.label }}
-        @if (itemIsActive(model.id)) {
+        @if (isModelSelected(model.id)) {
           <tui-icon icon="@tui.check" [style.font-size.rem]="1" />
         }
       </button>

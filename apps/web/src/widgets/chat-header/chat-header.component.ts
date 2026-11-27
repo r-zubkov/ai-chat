@@ -24,22 +24,22 @@ export class ChatHeaderComponent {
   readonly selectModel = inject(SelectModelService);
   readonly chatStore = inject(ChatStore);
 
-  protected readonly selectedModel = computed(() => {
+  protected readonly selectedModelLabel = computed(() => {
     const selectedModelId = this.settingsStore.selectedModelId();
     return this.selectModel.models().find((model) => model.id === selectedModelId)?.label ?? null;
   });
   protected readonly chatRoutes = CHAT_ROUTES;
 
-  protected onClick(model: ModelId): void {
+  protected onModelSelect(model: ModelId): void {
     void this.selectModel.selectModel(model);
     this.modelSelectionOpen = false;
   }
 
-  protected itemIsActive(model: ModelId): boolean {
+  protected isModelSelected(model: ModelId): boolean {
     return model === this.settingsStore.selectedModelId();
   }
 
-  protected toggleMenu(): void {
+  protected toggleSidebar(): void {
     this.shellUi.toggleSidebar();
   }
 }
