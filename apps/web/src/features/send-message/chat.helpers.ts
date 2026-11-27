@@ -1,10 +1,10 @@
 ﻿import type { ModelId } from '@ai-chat/contracts';
 import { Chat, ChatState, toChatId } from '@entities/chat';
-import { ChatMessage, SequelId, toMessageId, toSequelId } from '@entities/message';
+import { ChatMessage, SortKey, toMessageId, toSortKey } from '@entities/message';
 import { truncateAtWord } from '@shared/helpers';
 
-export function generateSequelId(localCounter: number): SequelId {
-  return toSequelId(Date.now() * 1000 + localCounter);
+export function generateSortKey(timestampMs: number, offset: number): SortKey {
+  return toSortKey(timestampMs * 1000 + offset);
 }
 
 export function createChatEntity(name: string, model: ModelId): Chat {

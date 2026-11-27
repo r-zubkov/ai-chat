@@ -4,7 +4,7 @@ import {
   ChatMessageRole,
   ChatMessageState,
   toMessageId,
-  toSequelId,
+  toSortKey,
 } from '@entities/message';
 import { GPT_MODELS, HISTORY_LIMIT } from '@shared/config';
 import { buildApiMessages } from './chat-api.helpers';
@@ -14,7 +14,7 @@ describe('chat-api.helpers', () => {
     const history = Array.from({ length: HISTORY_LIMIT + 2 }, (_, index) =>
       createHistoryMessage({
         id: `history-${index}`,
-        sequelId: index,
+        sortKey: index,
         role: index % 2 === 0 ? ChatMessageRole.USER : ChatMessageRole.ASSISTANT,
         state: index === HISTORY_LIMIT ? ChatMessageState.ERROR : ChatMessageState.COMPLETED,
         content: `Сообщение ${index}`,
@@ -22,7 +22,7 @@ describe('chat-api.helpers', () => {
     );
     const userMessage = createHistoryMessage({
       id: 'current-user',
-      sequelId: 999,
+      sortKey: 999,
       role: ChatMessageRole.USER,
       state: ChatMessageState.COMPLETED,
       content: 'Текущий вопрос',
@@ -42,7 +42,7 @@ describe('chat-api.helpers', () => {
 
 function createHistoryMessage(params: {
   id: string;
-  sequelId: number;
+  sortKey: number;
   role: ChatMessageRole;
   state: ChatMessageState;
   content: string;
@@ -50,7 +50,7 @@ function createHistoryMessage(params: {
   return {
     id: toMessageId(params.id),
     chatId: toChatId('chat-1'),
-    sequelId: toSequelId(params.sequelId),
+    sortKey: toSortKey(params.sortKey),
     role: params.role,
     model: GPT_MODELS.GPT_5_1.id,
     state: params.state,

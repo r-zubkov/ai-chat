@@ -19,7 +19,7 @@ export interface ChatRecord {
 export interface MessageRecord {
   id: string;
   chatId: string;
-  sequelId: number;
+  sortKey: number;
   role: string;
   model: string;
   state: string;
@@ -47,6 +47,20 @@ export class ChatDb extends Dexie {
       messages: 'id, sequelId, chatId, timestamp, [chatId+sequelId]',
       settings: 'key',
     });
+
+    this.version(2)
+      .stores({ messages: 'id, sortKey, chatId, timestamp, [chatId+sortKey]' })
+      .upgrade((transaction) =>
+        transaction
+          .table<{ sequelId?: number; sortKey?: number }, string>('messages')
+          .toCollection()
+          .modify((message) => {
+            if (message.sequelId === undefined) return;
+
+            message.sortKey = message.sequelId;
+            delete message.sequelId;
+          }),
+      );
   }
 }
 

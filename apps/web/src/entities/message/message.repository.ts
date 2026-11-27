@@ -8,14 +8,14 @@ import {
   isChatMessageRole,
   isChatMessageState,
   toMessageId,
-  toSequelId,
+  toSortKey,
 } from './message.model';
 
 @Injectable({ providedIn: 'root' })
 export class MessageRepository {
   async getMessagesByChatId(chatId: ChatId): Promise<ChatMessage[]> {
     const rows = await chatDB.messages
-      .where('[chatId+sequelId]')
+      .where('[chatId+sortKey]')
       .between([chatId, Dexie.minKey], [chatId, Dexie.maxKey])
       .toArray();
 
@@ -54,7 +54,7 @@ export class MessageRepository {
     return {
       id: toMessageId(row.id),
       chatId: row.chatId as ChatId,
-      sequelId: toSequelId(row.sequelId),
+      sortKey: toSortKey(row.sortKey),
       role: row.role,
       model: row.model,
       state: row.state,
@@ -68,7 +68,7 @@ export class MessageRepository {
       ...message,
       id: message.id,
       chatId: message.chatId,
-      sequelId: message.sequelId,
+      sortKey: message.sortKey,
     };
   }
 }

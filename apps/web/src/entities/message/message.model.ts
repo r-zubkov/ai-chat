@@ -1,14 +1,14 @@
 ﻿import type { ChatId } from '@entities/chat';
 
 export type MessageId = string & { readonly __brand: 'MessageId' };
-export type SequelId = number & { readonly __brand: 'SequelId' };
+export type SortKey = number & { readonly __brand: 'SortKey' };
 
 export function toMessageId(raw: string): MessageId {
   return raw as MessageId;
 }
 
-export function toSequelId(raw: number): SequelId {
-  return raw as SequelId;
+export function toSortKey(raw: number): SortKey {
+  return raw as SortKey;
 }
 
 export enum ChatMessageRole {
@@ -34,7 +34,7 @@ export function isChatMessageState(value: string): value is ChatMessageState {
 export interface ChatMessage {
   readonly id: MessageId;
   chatId: ChatId;
-  sequelId: SequelId;
+  sortKey: SortKey;
   role: ChatMessageRole;
   model: string;
   state: ChatMessageState;

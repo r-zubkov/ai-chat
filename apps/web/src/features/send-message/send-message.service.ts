@@ -24,7 +24,7 @@ import { SettingsStore } from '@entities/settings';
 import { ChatSocketService } from '@shared/api';
 import { STREAM_PERSIST_INTERVAL } from '@shared/config';
 import { buildApiMessages } from './chat-api.helpers';
-import { createChatEntity, createMessageEntity, generateSequelId } from './chat.helpers';
+import { createChatEntity, createMessageEntity, generateSortKey } from './chat.helpers';
 
 export enum ChatRequestEventType {
   STARTED = 'started',
@@ -80,15 +80,17 @@ export class SendMessageService {
           chatId = createdChat.id;
         }
 
-        let sequelCounter = 0;
         const activeChatId = chatId;
 
         if (!activeChatId || !chat) {
           throw new Error('Chat ID is not available');
         }
 
+        const timestampMs = Date.now();
+        let sortKeyOffset = 0;
+
         const userMessage = createMessageEntity({
-          sequelId: generateSequelId(sequelCounter++),
+          sortKey: generateSortKey(timestampMs, sortKeyOffset++),
           role: ChatMessageRole.USER,
           model,
           state: ChatMessageState.COMPLETED,
@@ -97,7 +99,7 @@ export class SendMessageService {
         });
 
         const assistantMessage = createMessageEntity({
-          sequelId: generateSequelId(sequelCounter++),
+          sortKey: generateSortKey(timestampMs, sortKeyOffset++),
           role: ChatMessageRole.ASSISTANT,
           model,
           state: ChatMessageState.STREAMING,

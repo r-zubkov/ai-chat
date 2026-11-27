@@ -1,15 +1,14 @@
 import { ChatState, toChatId } from '@entities/chat';
-import { ChatMessageRole, ChatMessageState, toSequelId } from '@entities/message';
+import { ChatMessageRole, ChatMessageState, toSortKey } from '@entities/message';
 import { GPT_MODELS } from '@shared/config';
-import { createChatEntity, createMessageEntity, generateSequelId } from './chat.helpers';
+import { createChatEntity, createMessageEntity, generateSortKey } from './chat.helpers';
 
 describe('chat.helpers', () => {
-  it('generates sequelId from time and a local counter', () => {
-    jest.spyOn(Date, 'now').mockReturnValue(123);
+  it('generates consecutive sort keys from the same timestamp', () => {
+    const timestampMs = 123;
 
-    const sequelId = generateSequelId(7);
-
-    expect(sequelId).toBe(toSequelId(123007));
+    expect(generateSortKey(timestampMs, 0)).toBe(toSortKey(123000));
+    expect(generateSortKey(timestampMs, 1)).toBe(toSortKey(123001));
   });
 
   it('creates a chat entity with default fields', () => {
@@ -33,7 +32,7 @@ describe('chat.helpers', () => {
 
     const message = createMessageEntity({
       chatId: toChatId('chat-1'),
-      sequelId: toSequelId(10),
+      sortKey: toSortKey(10),
       role: ChatMessageRole.USER,
       model: GPT_MODELS.GPT_5_1.id,
       state: ChatMessageState.COMPLETED,
