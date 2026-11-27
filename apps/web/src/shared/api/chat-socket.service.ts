@@ -13,7 +13,7 @@ import { Observable, Observer } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 
 @Injectable({ providedIn: 'root' })
-export class SocketService {
+export class ChatSocketService {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
   private readonly activeRequests = new Map<string, Observer<string>>();
 
@@ -77,7 +77,7 @@ export class SocketService {
     });
   }
 
-  sendChatCompletion(
+  streamChatCompletion(
     model: ModelId,
     messages: ChatRequestMessage[],
   ): { requestId: string; stream$: Observable<string> } {

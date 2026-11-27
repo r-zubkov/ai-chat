@@ -21,7 +21,7 @@ import {
   MessageStore,
 } from '@entities/message';
 import { SettingsStore } from '@entities/settings';
-import { SocketService } from '@shared/api';
+import { ChatSocketService } from '@shared/api';
 import { STREAM_PERSIST_INTERVAL } from '@shared/config';
 import { buildApiMessages } from './chat-api.helpers';
 import { createChatEntity, createMessageEntity, generateSequelId } from './chat.helpers';
@@ -49,7 +49,7 @@ export class SendMessageService {
   private readonly messageRepository = inject(MessageRepository);
   private readonly chatStore = inject(ChatStore);
   private readonly messageStore = inject(MessageStore);
-  private readonly socket = inject(SocketService);
+  private readonly socket = inject(ChatSocketService);
   private readonly settings = inject(SettingsStore);
 
   sendMessage(text: string, messageHistory: ChatMessage[]): Observable<ChatRequestEvent> {
@@ -111,7 +111,7 @@ export class SendMessageService {
 
         const apiMessages = buildApiMessages(messageHistory, userMessage);
 
-        const { requestId, stream$ } = this.socket.sendChatCompletion(model, apiMessages);
+        const { requestId, stream$ } = this.socket.streamChatCompletion(model, apiMessages);
 
         const activeChat = await this.updateChat(chat, {
           model,

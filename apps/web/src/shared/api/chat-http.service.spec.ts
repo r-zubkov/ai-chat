@@ -2,17 +2,17 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_ROUTES, GPT_MODELS } from '@ai-chat/contracts';
-import { HttpService } from './http.service';
+import { ChatHttpService } from './chat-http.service';
 
-describe('HttpService', () => {
-  let service: HttpService;
+describe('ChatHttpService', () => {
+  let service: ChatHttpService;
   let http: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [HttpService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [ChatHttpService, provideHttpClient(), provideHttpClientTesting()],
     });
-    service = TestBed.inject(HttpService);
+    service = TestBed.inject(ChatHttpService);
     http = TestBed.inject(HttpTestingController);
   });
 

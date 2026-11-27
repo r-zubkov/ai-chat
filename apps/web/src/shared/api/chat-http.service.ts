@@ -13,7 +13,7 @@ import { map, Observable } from 'rxjs';
 /**
  * Reserved HTTP gateway. Not used in the primary runtime chat flow.
  */
-export class HttpService {
+export class ChatHttpService {
   private readonly http = inject(HttpClient);
 
   sendChatCompletion(model: ModelId, messages: ChatRequestMessage[]): Observable<string> {
