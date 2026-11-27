@@ -52,12 +52,10 @@ export class ChatDb extends Dexie {
       .stores({ messages: 'id, sortKey, chatId, timestamp, [chatId+sortKey]' })
       .upgrade((transaction) =>
         transaction
-          .table<{ sequelId?: number; sortKey?: number }, string>('messages')
+          .table<{ timestamp: number; sequelId?: number; sortKey?: number }, string>('messages')
           .toCollection()
           .modify((message) => {
-            if (message.sequelId === undefined) return;
-
-            message.sortKey = message.sequelId;
+            message.sortKey = message.sequelId ?? message.timestamp * 1000;
             delete message.sequelId;
           }),
       );

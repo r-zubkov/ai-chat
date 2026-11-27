@@ -53,6 +53,7 @@
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^4.2.2",
     "eslint-plugin-import": "^2.32.0",
+    "fake-indexeddb": "^6.2.8",
     "istanbul-lib-instrument": "^6.0.3",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
