@@ -2,4 +2,4 @@ export const ADAPTER = {
   TIMEWEB: 'timeweb',
 } as const;
 
-export type Adapter = (typeof ADAPTER)[keyof typeof ADAPTER];
+export type AdapterId = (typeof ADAPTER)[keyof typeof ADAPTER];

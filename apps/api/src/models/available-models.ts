@@ -1,19 +1,19 @@
 import { getModelDefinition, type ModelDefinition, type ModelId } from '@ai-chat/contracts';
-import type { Adapter } from '../adapters/adapter.constants.js';
+import type { AdapterId } from '../adapters/adapter.constants.js';
 
 export type AvailableModelDefinition = ModelDefinition & {
-  readonly adapter: Adapter;
+  readonly adapter: AdapterId;
 };
 
 export type AvailableModels = ReadonlyMap<ModelId, AvailableModelDefinition>;
 
 interface AvailableModelGroup {
-  readonly adapter: Adapter;
+  readonly adapter: AdapterId;
   readonly modelIds: readonly ModelId[];
 }
 
 export function createAvailableModels(groups: readonly AvailableModelGroup[]): AvailableModels {
-  const adapterByModel = new Map<ModelId, Adapter>();
+  const adapterByModel = new Map<ModelId, AdapterId>();
 
   for (const group of groups) {
     for (const modelId of group.modelIds) {

@@ -11,7 +11,7 @@ export interface TimewebConfig {
 }
 
 export function loadTimewebConfig(source: AdapterEnvironment): TimewebConfig | undefined {
-  if (!useTimeweb(source)) return undefined;
+  if (!isTimewebEnabled(source)) return undefined;
 
   return Object.freeze({
     apiKey: requiredEnvironmentValue(source, API_KEY_ENVIRONMENT_KEY),
@@ -19,7 +19,7 @@ export function loadTimewebConfig(source: AdapterEnvironment): TimewebConfig | u
   });
 }
 
-function useTimeweb(source: AdapterEnvironment): boolean {
+function isTimewebEnabled(source: AdapterEnvironment): boolean {
   const value = source[USE_ENVIRONMENT_KEY]?.trim().toLowerCase();
 
   if (!value || value === 'false') return false;

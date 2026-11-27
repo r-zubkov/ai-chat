@@ -1,5 +1,5 @@
 import type { ChatRequestMessage, ModelId } from '@ai-chat/contracts';
-import type { Adapter } from '../adapters/adapter.constants.js';
+import type { AdapterId } from '../adapters/adapter.constants.js';
 
 export type InferenceMessage = ChatRequestMessage;
 
@@ -15,6 +15,6 @@ export type ChatStreamEvent =
   | { type: 'done'; finishReason?: string };
 
 export interface InferenceAdapter {
-  readonly id: Adapter;
+  readonly id: AdapterId;
   stream(request: InferenceRequest): AsyncIterable<ChatStreamEvent>;
 }
